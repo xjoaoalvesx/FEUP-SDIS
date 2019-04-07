@@ -1,12 +1,12 @@
-package files
+package files;
 
 public class Chunk{
 
     private byte[] chunkID;
-    private byte[] chunkData;
+    private char[] chunkData;
     private int replicationDegree;
 
-    public Chunk(chunkID, chunkData, replicationDegree){
+    public Chunk(byte[] chunkID, char[] chunkData, int replicationDegree){
         this.chunkID = chunkID;
         this.chunkData = chunkData;
         this.replicationDegree = replicationDegree;
@@ -16,7 +16,7 @@ public class Chunk{
         return chunkID;
     }
 
-    public byte[] getChunkData(){
+    public char[] getChunkData(){
         return chunkData;
     }
 
