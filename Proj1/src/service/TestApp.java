@@ -1,14 +1,21 @@
 package service;
 
+
+import java.rmi.RemoteException;
+import java.rmi.registry.Registry;
+import java.rmi.registry.LocateRegistry;
+
 public class TestApp implements Runnable {
 
 
-	private String[] peer_ap;
+	private String peer_ap;
     private String sub_protocol;
     private String opnd_1;
     private String opnd_2;
 
-	public TestApp(String[] peer_ap, String sub_protocol, String opnd_1, String opnd_2){
+    private RemoteService stub;
+
+	public TestApp(String peer_ap, String sub_protocol, String opnd_1, String opnd_2){
 
 		this.peer_ap = peer_ap;
 		this.sub_protocol = sub_protocol;
@@ -28,7 +35,7 @@ public class TestApp implements Runnable {
 
 		}
 		
-		String[] peer_ap = args[0];
+		String peer_ap = args[0];
 
 		
 		if(peer_ap == null){
@@ -45,6 +52,22 @@ public class TestApp implements Runnable {
 
 	}
 
+	@Override
+    public void run() {
+    	initStub();
+    }
+
+    private void initStub(){
+
+    	String name = "P" + peer_ap;
+    	try{
+    		Registry registry = LocateRegistry.getRegistry(null);
+    		stub = (RemoteService) registry.lookup(name);
+    	} catch (Exception e){
+    		System.err.println("Error finding stub");
+    		e.printStackTrace();
+    	}
+    }
 
 
 }
