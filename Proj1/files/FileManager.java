@@ -1,9 +1,12 @@
 package files;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.charset.StandardCharsets;
 import java.io.*;
 import java.security.*;
-import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+
 
 
 
@@ -38,13 +41,12 @@ public class FileManager{
         int chunksSize = ((int) size) / 64000 + 1;
         this.chunks = new Chunk[chunksSize];
         
-        BufferedReader buffer = new BufferedReader(new FileReader(file));
+        byte[] buffer = Files.readAllBytes(file.toPath());
         
         int i = 0;
         int c = 0;
         while(i < (size - 64000)){
-            char[] tempbuf = new char[64000];
-            buffer.read(tempbuf, i, 64000);
+            byte[] tempbuf = Arrays.copyOfRange(buffer, i, i+64000);
             
             byte[] chunkID = encode(filepath, c);
             
@@ -57,8 +59,7 @@ public class FileManager{
 
         int lastSize = ((int) size) % 64000;
 
-        char[] lastbuf = new char[lastSize];
-        buffer.read(lastbuf, i, lastSize);
+        byte[] lastbuf = Arrays.copyOfRange(buffer, i, lastSize);
 
         byte[] finalChunkID = encode(filepath, c);        
 
