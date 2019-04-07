@@ -23,6 +23,7 @@ public class FileManager{
     public FileManager(String filepath) throws IOException, NoSuchAlgorithmException{
         this.filepath = filepath;
         this.check();
+        this.rebuilder(this.chunks);
     }
 
     private void check() throws IOException, NoSuchAlgorithmException{
@@ -59,12 +60,13 @@ public class FileManager{
 
         int lastSize = ((int) size) % 64000;
 
-        byte[] lastbuf = Arrays.copyOfRange(buffer, i, lastSize);
+        byte[] lastbuf = Arrays.copyOfRange(buffer, i, i+lastSize);
 
         byte[] finalChunkID = encode(filepath, c);        
 
         /*TODO Replication Degree */
         this.chunks[c] = new Chunk(finalChunkID, lastbuf, 1);
+
        
     }
     
@@ -75,5 +77,20 @@ public class FileManager{
 
         return encodedhash;
     
+    }
+    
+    private void rebuilder(Chunk[] chunks) throws IOException{
+        File newfile = new File("temp");
+        if(newfile.exists()){
+            newfile.delete();
+        }
+        newfile.createNewFile();
+        
+        try (FileOutputStream stream = new FileOutputStream("temp")) {
+            for(Chunk c : chunks){
+                stream.write(c.getChunkData());
+            }
+            stream.close();
+        }
     }
 }

@@ -23,4 +23,8 @@ public class Chunk{
     public int getReplicationDegree(){
         return replicationDegree;
     }
+    
+    public int getSize(){
+        return (int) chunkData.length;
+    }
 }
