@@ -7,16 +7,19 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 
-public abstract class Channel implements Runnable {
+public class Channel implements Runnable {
 
-    private static final int MAX_MESSAGE_SIZE = 65000;
+    private static final int MAX_SIZE = 65000;
 
     private MulticastSocket multicastSocket;
     private InetAddress multicastAddr;
     private int multicastPort;
     private Peer parentPeer;
+    private String channelType;
 
-    public Channel(Peer parentPeer, String multicastAddr, String multicastPort) {
+    public Channel(String channelType, Peer parentPeer, String multicastAddr, String multicastPort) {
+
+        this.channelType = channelType;
         this.parentPeer = parentPeer;
 
         try {
@@ -26,15 +29,15 @@ public abstract class Channel implements Runnable {
             e.printStackTrace();
         }
 
-        initialize();
+        init();
+        System.out.println(channelType + " channel initialized!");
     }
 
     private void init() {
-
         try {
             multicastSocket = new MulticastSocket(multicastPort);
             multicastSocket.setTimeToLive(1);
-            multicastSocket.joinGroup(mcastAddr);
+            multicastSocket.joinGroup(multicastAddr);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -43,14 +46,14 @@ public abstract class Channel implements Runnable {
     @Override
     public void run() {
 
-        byte[] rbuf = new byte[MAX_MESSAGE_SIZE];
+        byte[] rbuf = new byte[MAX_SIZE];
         DatagramPacket packet = new DatagramPacket(rbuf, rbuf.length);
 
         while (true) {
 
-            try { // blocking method
+            try { 
                 this.multicastSocket.receive(packet);
-                this.parentPeer.addMsgToHandler(packet.getData(), packet.getLength());
+                // call function to work with packet
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -59,7 +62,6 @@ public abstract class Channel implements Runnable {
     }
 
     synchronized public void sendMessage(byte[] message) throws IOException {
-
         DatagramPacket packet = new DatagramPacket(message, message.length, multicastAddr, multicastPort);
         multicastSocket.send(packet);
     }
