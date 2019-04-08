@@ -44,5 +44,25 @@ public class Peer implements RemoteService{
     public void backup() {
         System.out.println("BACKUP");
     }
+
+    @Override
+    public void restore() {
+        System.out.println("RESTORE");
+    }
+
+    @Override
+    public void delete() {
+        System.out.println("DELETE");
+    }
+
+    @Override
+    public void reclaim() {
+        System.out.println("RECLAIM");
+    }
+
+    @Override
+    public void state() {
+        System.out.println("STATE");
+    }
 	
 }

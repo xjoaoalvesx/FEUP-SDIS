@@ -1,5 +1,6 @@
 package service;
 
+import java.util.ArrayList;
 
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
@@ -12,6 +13,8 @@ public class TestApp implements Runnable {
     private String sub_protocol;
     private String opnd_1;
     private String opnd_2;
+   	private ArrayList<Runnable> protocol_handlers;
+   	private int sub_protocol_index;
 
     private RemoteService stub;
 
@@ -22,8 +25,30 @@ public class TestApp implements Runnable {
 		this.opnd_1 = opnd_1;
 		this.opnd_2 = opnd_2;
 
+		protocol_handlers = new ArrayList<Runnable> ();
+		protocol_handlers.add(this::backup_handler);
+		protocol_handlers.add(this::restore_handler);
+		protocol_handlers.add(this::delete_handler);
+		protocol_handlers.add(this::reclaim_handler);
+		protocol_handlers.add(this::state_handler);
 
-		//TODO: maybe use data structure for mapping the handlers (backup, restore, delete, reclaim, state)
+		switch(sub_protocol){
+			case "BACKUP":
+				this.sub_protocol_index = 0;
+				break;
+			case "RESTORE":
+				this.sub_protocol_index = 1;
+				break;
+			case "DELETE":
+				this.sub_protocol_index = 2;
+				break;
+			case "RECLAIM":
+				this.sub_protocol_index = 3;
+				break;
+			case "STATE":
+				this.sub_protocol_index = 4;
+				break;
+		}
 
 	}
 
@@ -55,6 +80,7 @@ public class TestApp implements Runnable {
 	@Override
     public void run() {
     	initStub();
+    	protocol_handlers.get(sub_protocol_index).run();
     }
 
     private void initStub(){
@@ -69,5 +95,44 @@ public class TestApp implements Runnable {
     	}
     }
 
+    private void backup_handler(){
+    	try {
+            stub.backup();
+        } catch (RemoteException e) {
+            System.err.println("Client exception: " + e.toString());
+        }
+    }
+
+    private void restore_handler(){
+    	try {
+            stub.restore();
+        } catch (RemoteException e) {
+            System.err.println("Client exception: " + e.toString());
+        }
+    }
+
+    private void delete_handler(){
+    	try {
+            stub.delete();
+        } catch (RemoteException e) {
+            System.err.println("Client exception: " + e.toString());
+        }
+    }
+
+    private void reclaim_handler(){
+    	try {
+            stub.reclaim();
+        } catch (RemoteException e) {
+            System.err.println("Client exception: " + e.toString());
+        }
+    }
+
+    private void state_handler(){
+    	try {
+            stub.state();
+        } catch (RemoteException e) {
+            System.err.println("Client exception: " + e.toString());
+        }
+    }
 
 }
