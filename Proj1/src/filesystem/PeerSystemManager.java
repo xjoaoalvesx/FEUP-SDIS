@@ -71,6 +71,9 @@ public class PeerSystemManager{
     }
 
     private Chunk[] divider() throws IOException, FileNotFoundException, NoSuchAlgorithmException{
+   
+        byte[] fileId = encode(this.path);
+
         long size = file.length();
 
         int chunksSize = ((int) size) / 64000 + 1;
@@ -84,7 +87,7 @@ public class PeerSystemManager{
             byte[] tempbuf = Arrays.copyOfRange(buffer, i, i+64000);
             
             //TODO Replication Degree 
-            this.chunks[c] = new Chunk(c, tempbuf, 1);
+            this.chunks[c] = new Chunk(c, fileId, tempbuf, 1);
             
             i = i + 64000;
             c++;
@@ -95,17 +98,17 @@ public class PeerSystemManager{
         byte[] lastbuf = Arrays.copyOfRange(buffer, i, i+lastSize);     
 
         //TODO Replication Degree 
-        this.chunks[c] = new Chunk(c, lastbuf, 1);
+        this.chunks[c] = new Chunk(c, fileId, lastbuf, 1);
 
 	return this.chunks();
 
        
     }
     
-    private byte[] encode(String filename, int chunkno) throws NoSuchAlgorithmException{
-        String cod = filename + String.valueOf(chunkno);
+    private byte[] encode(String filename) throws NoSuchAlgorithmException{
+
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        byte[] encodedhash = digest.digest(cod.getBytes(StandardCharsets.UTF_8));
+        byte[] encodedhash = digest.digest(filename.getBytes(StandardCharsets.UTF_8));
 
         return encodedhash;
     
