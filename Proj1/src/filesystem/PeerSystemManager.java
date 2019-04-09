@@ -22,18 +22,26 @@ public class PeerSystemManager{
 
     public PeerSystemManager(Peer parent_peer) {
         this.parent_peer = parent_peer;
-        this.path = "../Peers/Peer" + parent_peer.getId() + "/";
-        createFolder("filesystem/Peer" + parent_peer.getId() + "/");
+        this.path = "src/filesystem/Peer" + parent_peer.getId() + "/";
+
+        setupFileSystem();
+
+
     }
 
 
 
-    public void createFolder(String path){
+    public void createDirectories(String path){
         try{
             Files.createDirectories(Paths.get(path));
         } catch (IOException e){
             System.out.println("Error creating folder");
         }
+    }
+
+    public void setupFileSystem(){
+        createDirectories(path + "backup/");
+        createDirectories(path + "restored/");
     }
 
 
