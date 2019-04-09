@@ -55,14 +55,26 @@ public class PeerSystemManager{
         return true;   
     }
 
-    private Chunk[] divider() {
+    private Chunk[] check(String filepath) throws IOException, NoSuchAlgorithmException{
+        File file = new File(filepath);
+	Chunk[] empty = {};	
+
+        if(file.isFile()){
+            return this.divider(filepath, file);
+        }else{
+            System.out.println("Error reading the file");
+            return empty;
+        }
+    }
+
+    private Chunk[] divider(String path, File file) {
    
-        byte[] fileId = encode(this.path);
+        byte[] fileId = encode(path);
 
         long size = file.length();
 
         int chunksSize = ((int) size) / 64000 + 1;
-        this.chunks = new Chunk[chunksSize];
+        Chunk[] chunks = new Chunk[chunksSize];
         
         byte[] buffer = Files.readAllBytes(file.toPath());
         
@@ -72,7 +84,7 @@ public class PeerSystemManager{
             byte[] tempbuf = Arrays.copyOfRange(buffer, i, i+64000);
             
             //TODO Replication Degree 
-            this.chunks[c] = new Chunk(c, fileId, tempbuf, 1);
+            chunks[c] = new Chunk(c, fileId, tempbuf, 1);
             
             i = i + 64000;
             c++;
@@ -83,9 +95,9 @@ public class PeerSystemManager{
         byte[] lastbuf = Arrays.copyOfRange(buffer, i, i+lastSize);     
 
         //TODO Replication Degree 
-        this.chunks[c] = new Chunk(c, fileId, lastbuf, 1);
+        chunks[c] = new Chunk(c, fileId, lastbuf, 1);
 
-    return this.chunks;
+    return chunks;
 
        
     }
