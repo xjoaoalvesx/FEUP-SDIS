@@ -1,8 +1,11 @@
-package files;
+package filesystem;
 
-import java.io.File;
+import service.Peer;
+
 import java.nio.file.Files;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.io.*;
 import java.security.*;
 import java.util.Arrays;
@@ -10,21 +13,33 @@ import java.util.Arrays;
 
 
 
-public class FileManager{
 
-    private String filepath;
-    Chunk[] chunks;
-    private File file;
 
-    public static void main(String[] args) throws IOException, NoSuchAlgorithmException{
-        FileManager f = new FileManager(args[0]);
+public class PeerSystemManager{
+
+    private Peer parent_peer;
+    private String path;
+
+    public PeerSystemManager(Peer parent_peer) {
+        this.parent_peer = parent_peer;
+        this.path = "../Peers/Peer" + parent_peer.getId() + "/";
+        createFolder("filesystem/Peer" + parent_peer.getId() + "/");
     }
 
-    public FileManager(String filepath) throws IOException, NoSuchAlgorithmException{
-        this.filepath = filepath;
-        this.check();
-        this.rebuilder(this.chunks);
+
+
+    public void createFolder(String path){
+        try{
+            Files.createDirectories(Paths.get(path));
+        } catch (IOException e){
+            System.out.println("Error creating folder");
+        }
     }
+
+
+
+
+/*
 
     private void check() throws IOException, NoSuchAlgorithmException{
         file = new File(filepath);
@@ -51,7 +66,7 @@ public class FileManager{
             
             byte[] chunkID = encode(filepath, c);
             
-            /*TODO Replication Degree */
+            //TODO Replication Degree 
             this.chunks[c] = new Chunk(chunkID, tempbuf, 1);
             
             i = i + 64000;
@@ -64,7 +79,7 @@ public class FileManager{
 
         byte[] finalChunkID = encode(filepath, c);        
 
-        /*TODO Replication Degree */
+        //TODO Replication Degree 
         this.chunks[c] = new Chunk(finalChunkID, lastbuf, 1);
 
        
@@ -93,4 +108,6 @@ public class FileManager{
             stream.close();
         }
     }
+    */
+
 }

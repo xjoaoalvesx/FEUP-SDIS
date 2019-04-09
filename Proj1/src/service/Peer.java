@@ -1,6 +1,7 @@
 package service;
 
 import channels.Channel;
+import filesystem.PeerSystemManager;
 
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
@@ -15,6 +16,7 @@ public class Peer implements RemoteService{
 	private Channel mc;
 	private Channel mdb;
 	private Channel mdr;
+	private PeerSystemManager manager;
 
 	public Peer(String protocol_version, int id, String access_point, String[] mc_name, String[] mdb_name, String[] mdr_name){
 		this.id = id;
@@ -22,6 +24,7 @@ public class Peer implements RemoteService{
 		this.access_point = access_point;
 
 		startChannels(mc_name, mdb_name, mdr_name);
+		manager = new PeerSystemManager(this);
 
 		System.out.println("Peer " + id + " entered the network!");
 	}
@@ -95,4 +98,7 @@ public class Peer implements RemoteService{
         System.out.println("STATE");
     }
 	
+	public int getId(){
+		return this.id;
+	}
 }
