@@ -3,7 +3,10 @@ package service;
 import channels.Channel;
 import filesystem.PeerSystemManager;
 import subprotocols.Backup;
+import messages.Message;
+import messages.MessageHandler;
 
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
 import java.rmi.registry.LocateRegistry;
@@ -32,7 +35,7 @@ public class Peer implements RemoteService{
 		startChannels(mc_name, mdb_name, mdr_name);
 		manager = new PeerSystemManager(this);
 
-		scheduler = new ScheduledThreadPoolExecutor(2);
+		scheduler = new ScheduledThreadPoolExecutor(5);
 
 		System.out.println("Peer " + id + " entered the network!");
 	}
@@ -79,7 +82,21 @@ public class Peer implements RemoteService{
 		new Thread(this.mdr).start();
 	}
 
+	public void sendMessageMC(Message msg) throws IOException{
+		mc.sendMessage(msg.getMessageInBytes());
+	}
 
+	public void sendMessageMDB(Message msg) throws IOException{
+		mdb.sendMessage(msg.getMessageInBytes());
+	}
+
+	public void sendMessageMDR(Message msg) throws IOException{
+		mdr.sendMessage(msg.getMessageInBytes());
+	}
+
+	public void executeMessageHandler(Message m){
+		scheduler.execute(new MessageHandler(this, m));
+	}
 
 	@Override
     public void backup(String path, int replicationDegree) {
@@ -108,5 +125,9 @@ public class Peer implements RemoteService{
 	
 	public int getId(){
 		return this.id;
+	}
+
+	public PeerSystemManager getPeerSystemManager(){
+		return manager;
 	}
 }

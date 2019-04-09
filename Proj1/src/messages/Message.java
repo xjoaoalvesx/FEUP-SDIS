@@ -119,13 +119,13 @@ public class Message{
         return n;
     }
     
-    public byte[] getMessage(){
+    public byte[] getMessageInBytes(){
         return this.message;
     }
     
     public byte[] getBody(){
         if(this.body.length == 0){
-            System.out.println("There is no body attatched to this body");
+            System.out.println("There is no body attatched");
         }
         return this.body;
     }

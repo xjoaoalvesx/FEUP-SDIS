@@ -1,6 +1,7 @@
 package channels;
 
 import service.Peer;
+import messages.Message;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -53,7 +54,7 @@ public class Channel implements Runnable {
 
             try { 
                 this.multicastSocket.receive(packet);
-                // call function to work with packet
+                this.parentPeer.executeMessageHandler(new Message(packet.getData()));
             } catch (IOException e) {
                 e.printStackTrace();
             }

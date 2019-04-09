@@ -27,7 +27,7 @@ public class PeerSystemManager{
 
 
 
-    public void createDirectories(String path){
+    public static void createDirectories(String path){
         try{
             Files.createDirectories(Paths.get(path));
         } catch (IOException e){
@@ -38,6 +38,21 @@ public class PeerSystemManager{
     public void setupFileSystem(){
         createDirectories(path + "backup/");
         createDirectories(path + "restored/");
+    }
+
+    public boolean saveFile(String name, String path, byte[] data) throws IOException {
+
+        String file_path = path + "/" + name;
+        
+        if (Files.exists(Paths.get(file_path))) {
+            return false;
+        }
+
+        OutputStream out = Files.newOutputStream(Paths.get(file_path));
+        out.write(data);
+        out.close();
+
+        return true;   
     }
 
 

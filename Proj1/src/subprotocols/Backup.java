@@ -2,6 +2,8 @@ package subprotocols;
 
 import service.Peer;
 
+import messages.Message;
+
 public class Backup implements Runnable{
 
 	private Peer parent_peer;
@@ -21,6 +23,10 @@ public class Backup implements Runnable{
 	@Override
     public void run() {
     	System.out.println("backup run");
+    }
+
+    private Message create_putchunk(Chunk chunk, String version){
+    	return new Message("PUTCHUNK", )
     }
 
 }
