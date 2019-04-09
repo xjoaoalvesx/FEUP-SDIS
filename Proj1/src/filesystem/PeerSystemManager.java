@@ -55,22 +55,7 @@ public class PeerSystemManager{
         return true;   
     }
 
-
-
-
-/*
-
-    private void check() throws IOException, NoSuchAlgorithmException{
-        file = new File(filepath);
-
-        if(file.isFile()){
-            this.divider();
-        }else{
-            System.out.println("Error reading the file");
-        }
-    }
-
-    private Chunk[] divider() throws IOException, FileNotFoundException, NoSuchAlgorithmException{
+    private Chunk[] divider() {
    
         byte[] fileId = encode(this.path);
 
@@ -100,10 +85,25 @@ public class PeerSystemManager{
         //TODO Replication Degree 
         this.chunks[c] = new Chunk(c, fileId, lastbuf, 1);
 
-	return this.chunks();
+    return this.chunks;
 
        
     }
+
+
+/*
+
+    private void check() throws IOException, NoSuchAlgorithmException{
+        file = new File(filepath);
+
+        if(file.isFile()){
+            this.divider();
+        }else{
+            System.out.println("Error reading the file");
+        }
+    }
+
+    
     
     private byte[] encode(String filename) throws NoSuchAlgorithmException{
 
