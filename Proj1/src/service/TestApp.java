@@ -26,11 +26,11 @@ public class TestApp implements Runnable {
 		this.opnd_2 = opnd_2;
 
 		protocol_handlers = new ArrayList<Runnable> ();
-		protocol_handlers.add(this::backup_handler);
-		protocol_handlers.add(this::restore_handler);
-		protocol_handlers.add(this::delete_handler);
-		protocol_handlers.add(this::reclaim_handler);
-		protocol_handlers.add(this::state_handler);
+		protocol_handlers.add(this::backup_start);
+		protocol_handlers.add(this::restore_start);
+		protocol_handlers.add(this::delete_start);
+		protocol_handlers.add(this::reclaim_start);
+		protocol_handlers.add(this::state_start);
 
 		switch(sub_protocol){
 			case "BACKUP":
@@ -95,15 +95,15 @@ public class TestApp implements Runnable {
     	}
     }
 
-    private void backup_handler(){
+    private void backup_start(){
     	try {
-            stub.backup();
+            stub.backup(this.opnd_1, Integer.parseInt(this.opnd_2));
         } catch (RemoteException e) {
             System.err.println("Client exception: " + e.toString());
         }
     }
 
-    private void restore_handler(){
+    private void restore_start(){
     	try {
             stub.restore();
         } catch (RemoteException e) {
@@ -111,7 +111,7 @@ public class TestApp implements Runnable {
         }
     }
 
-    private void delete_handler(){
+    private void delete_start(){
     	try {
             stub.delete();
         } catch (RemoteException e) {
@@ -119,7 +119,7 @@ public class TestApp implements Runnable {
         }
     }
 
-    private void reclaim_handler(){
+    private void reclaim_start(){
     	try {
             stub.reclaim();
         } catch (RemoteException e) {
@@ -127,7 +127,7 @@ public class TestApp implements Runnable {
         }
     }
 
-    private void state_handler(){
+    private void state_start(){
     	try {
             stub.state();
         } catch (RemoteException e) {

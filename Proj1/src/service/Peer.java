@@ -2,11 +2,15 @@ package service;
 
 import channels.Channel;
 import filesystem.PeerSystemManager;
+import subprotocols.Backup;
 
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
+
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 public class Peer implements RemoteService{
 
@@ -18,6 +22,8 @@ public class Peer implements RemoteService{
 	private Channel mdr;
 	private PeerSystemManager manager;
 
+	private ScheduledExecutorService scheduler;
+
 	public Peer(String protocol_version, int id, String access_point, String[] mc_name, String[] mdb_name, String[] mdr_name){
 		this.id = id;
 		this.protocol_version = protocol_version;
@@ -25,6 +31,8 @@ public class Peer implements RemoteService{
 
 		startChannels(mc_name, mdb_name, mdr_name);
 		manager = new PeerSystemManager(this);
+
+		scheduler = new ScheduledThreadPoolExecutor(2);
 
 		System.out.println("Peer " + id + " entered the network!");
 	}
@@ -41,9 +49,9 @@ public class Peer implements RemoteService{
 		String protocol_version = args[0];
 		String service_access_point = args[2];
 
-		String[] mc_name = args[3].split(":");
-		String[] mdb_name = args[4].split(":");
-		String[] mdr_name = args[5].split(":");
+		String[] mc_name = args[3].split("/");
+		String[] mdb_name = args[4].split("/");
+		String[] mdr_name = args[5].split("/");
 
 		try {
 			Peer peer = new Peer(protocol_version, peerID, service_access_point, mc_name, mdb_name, mdr_name);
@@ -74,8 +82,8 @@ public class Peer implements RemoteService{
 
 
 	@Override
-    public void backup() {
-        System.out.println("BACKUP");
+    public void backup(String path, int replicationDegree) {
+        scheduler.execute(new Backup(this, protocol_version, path, replicationDegree));
     }
 
     @Override

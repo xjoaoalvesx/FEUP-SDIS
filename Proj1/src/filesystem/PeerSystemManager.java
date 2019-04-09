@@ -11,10 +11,6 @@ import java.security.*;
 import java.util.Arrays;
 
 
-
-
-
-
 public class PeerSystemManager{
 
     private Peer parent_peer;
