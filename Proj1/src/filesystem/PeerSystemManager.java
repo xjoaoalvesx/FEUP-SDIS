@@ -70,7 +70,7 @@ public class PeerSystemManager{
         }
     }
 
-    private void divider() throws IOException, FileNotFoundException, NoSuchAlgorithmException{
+    private Chunk[] divider() throws IOException, FileNotFoundException, NoSuchAlgorithmException{
         long size = file.length();
 
         int chunksSize = ((int) size) / 64000 + 1;
@@ -83,10 +83,8 @@ public class PeerSystemManager{
         while(i < (size - 64000)){
             byte[] tempbuf = Arrays.copyOfRange(buffer, i, i+64000);
             
-            byte[] chunkID = encode(filepath, c);
-            
             //TODO Replication Degree 
-            this.chunks[c] = new Chunk(chunkID, tempbuf, 1);
+            this.chunks[c] = new Chunk(c, tempbuf, 1);
             
             i = i + 64000;
             c++;
@@ -94,12 +92,12 @@ public class PeerSystemManager{
 
         int lastSize = ((int) size) % 64000;
 
-        byte[] lastbuf = Arrays.copyOfRange(buffer, i, i+lastSize);
-
-        byte[] finalChunkID = encode(filepath, c);        
+        byte[] lastbuf = Arrays.copyOfRange(buffer, i, i+lastSize);     
 
         //TODO Replication Degree 
-        this.chunks[c] = new Chunk(finalChunkID, lastbuf, 1);
+        this.chunks[c] = new Chunk(c, lastbuf, 1);
+
+	return this.chunks();
 
        
     }

@@ -2,17 +2,17 @@ package filesystem;
 
 public class Chunk{
 
-    private byte[] chunkID;
+    private int chunkID;
     private byte[] chunkData;
     private int replicationDegree;
 
-    public Chunk(byte[] chunkID, byte[] chunkData, int replicationDegree){
+    public Chunk(int chunkID, byte[] chunkData, int replicationDegree){
         this.chunkID = chunkID;
         this.chunkData = chunkData;
         this.replicationDegree = replicationDegree;
     }
 
-    public byte[] getID(){
+    public int getID(){
         return chunkID;
     }
 
