@@ -129,4 +129,29 @@ public class Message{
         }
         return this.body;
     }
+    
+    public String getMessageType(){
+        return this.messageType;
+    }
+    
+    public String getVersion(){
+        return this.version;
+    }
+    
+    public String getSenderId(){
+        return this.senderId;
+    }
+    
+    public String getFileId(){
+        return this.fileId;
+    }
+    
+    public String getChunkNo(){
+        return this.chunkNo;
+    }
+    
+    public String getReplicationDeg(){
+        return this.replicationDeg;
+    }
+
 }
