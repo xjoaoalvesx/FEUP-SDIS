@@ -59,22 +59,20 @@ public class Message{
     
     private void decompose(){
         int pos = 0;
-        int sizeMessage = (int) this.message.length;
-        byte cr = "\r".getBytes()[0];
-        byte lf = "\n".getBytes()[0];
-        while(true){
-            pos = Arrays.binarySearch(this.message, pos, sizeMessage, cr);
-            if(pos == -1){
-                System.out.println("Message Structure Error");
-                return;
-            }
-            if(this.message[pos+1] == lf && this.message[pos+2] == cr && this.message[pos+3] == lf){
+        int sizeMessage = (int) this.message.length - 1;
+        byte cr = "\r\n".getBytes()[0];
+        byte lf = "\r\n".getBytes()[1];
+       
+        for (byte b : this.message){
+            if(b == cr && this.message[pos+1] == lf && this.message[pos+2] == cr && this.message[pos+3] == lf){
                 break;
             }
+            pos++;
         }
+
         
         byte[] header = Arrays.copyOfRange(this.message, 0, pos);
-        this.body = Arrays.copyOfRange(this.message, pos+4, sizeMessage);
+        this.body = Arrays.copyOfRange(this.message, pos+3, sizeMessage);
         
         String header_s = new String(header);
         this.fillHeader(header_s);
@@ -87,24 +85,31 @@ public class Message{
         
         i = this.skipSpaces(values, i);
         this.messageType = values[i];
+        i++;
         
         i = this.skipSpaces(values, i);
         this.version = values[i];
+        i++;
         
         i = this.skipSpaces(values, i);
         this.senderId = values[i];
+        i++;
         
         i = this.skipSpaces(values, i);
         this.fileId = values[i];
+        i++;
         
         i = this.skipSpaces(values, i);
-        if(i == sizeArr){
+        if(i >= sizeArr){
             return;
         }
         this.chunkNo = values[i];
+        i++;
         
+        System.out.println(i);
         i = this.skipSpaces(values, i);
-        if(i == sizeArr){
+        System.out.println(i);
+        if(i >= sizeArr){
             return;
         }
         this.replicationDeg = values[i];
@@ -112,8 +117,11 @@ public class Message{
     }
     
     private int skipSpaces(String[] s, int n){
-        int sizeArr = (int) s.length; 
-        while (s[n] == "" && n < sizeArr){
+        int sizeArr = (int) s.length;
+        if (n >= sizeArr){
+            return n;
+        }
+        while (s[n] == ""){
             n++;
         }
         return n;
@@ -153,5 +161,6 @@ public class Message{
     public String getReplicationDeg(){
         return this.replicationDeg;
     }
+
 
 }
