@@ -3,6 +3,11 @@ package subprotocols;
 import service.Peer;
 import filesystem.Chunk;
 import messages.Message;
+import subprotocols.workers.BackupWorker;
+
+import java.io.IOException;
+
+import static filesystem.PeerSystemManager.check;
 
 public class Backup implements Runnable{
 
@@ -22,13 +27,31 @@ public class Backup implements Runnable{
 
 	@Override
     public void run() {
-    	//enviar putchunks
+
+    	Chunk[] chunks = null;
+    	try{
+    		chunks = check(this.path);
+    	}catch (IOException e){
+    		e.printStackTrace();
+    	}
+    	
+
+    	for(Chunk chunk : chunks){
+    		Thread worker = new Thread (new BackupWorker(this, chunk));
+    		worker.start();
+    	}
+
     	System.out.println("backup run");
     }
 
-    private Message create_putchunk_message(Chunk chunk, String version){
-    	return new Message("PUTCHUNK", version, Integer.toString(parent_peer.getId()), 
-    		chunk.getFileID().toString(), Integer.toString(chunk.getID()), Integer.toString(chunk.getReplicationDegree()), chunk.getChunkData());
+    public Peer getParentPeer(){
+    	return parent_peer;
     }
+
+    public String getProtocolVersion(){
+    	return version;
+    }
+
+    
 
 }

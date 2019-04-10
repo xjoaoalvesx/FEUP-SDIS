@@ -42,7 +42,7 @@ public class Message{
     }
 
     private void createMessage(){
-        String header = this.messageType + " " + this.version + " " + this.senderId + " " + this.fileId + " " + this.chunkNo + "\r\n" + "\r\n";
+        String header = this.messageType + " " + this.version + " " + this.senderId + " " + this.fileId + " " + this.chunkNo + " " + this.replicationDeg + "\r\n" + "\r\n";
         byte[] headerByte = header.getBytes();
         
         int sizeHeader = (int) headerByte.length;
@@ -81,6 +81,8 @@ public class Message{
     private void fillHeader(String header){
         int i = 0;
         String[] values = header.split(" ");
+        
+        
         int sizeArr = (int) values.length;
         
         i = this.skipSpaces(values, i);
@@ -107,8 +109,8 @@ public class Message{
         i++;
         
         System.out.println(i);
+        System.out.println(values.length);
         i = this.skipSpaces(values, i);
-        System.out.println(i);
         if(i >= sizeArr){
             return;
         }

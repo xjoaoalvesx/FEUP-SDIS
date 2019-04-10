@@ -55,21 +55,27 @@ public class PeerSystemManager{
         return true;   
     }
 
-    private Chunk[] check(String filepath) throws IOException, NoSuchAlgorithmException{
+    public static Chunk[] check(String filepath) throws IOException{
         File file = new File(filepath);
-	Chunk[] empty = {};	
+	       
+        Chunk[] empty = {};	
 
         if(file.isFile()){
-            return this.divider(filepath, file);
+            return divider(filepath, file);
         }else{
             System.out.println("Error reading the file");
             return empty;
         }
     }
 
-    private Chunk[] divider(String path, File file) {
-   
-        byte[] fileId = encode(path);
+    public static Chunk[] divider(String path, File file) throws IOException{
+        
+        byte[] fileId = null;
+        try{
+            fileId = encode(path);
+        } catch (NoSuchAlgorithmException n) {
+            System.out.println("Algorithm not found!");
+        }
 
         long size = file.length();
 
@@ -97,9 +103,20 @@ public class PeerSystemManager{
         //TODO Replication Degree 
         chunks[c] = new Chunk(c, fileId, lastbuf, 1);
 
-    return chunks;
+        return chunks;
 
        
+    }
+
+    private static byte[] encode(String filename) throws NoSuchAlgorithmException{
+
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+       
+
+        byte[] encodedhash = md.digest(filename.getBytes(StandardCharsets.UTF_8));
+
+        return encodedhash;
+    
     }
 
 
@@ -117,14 +134,7 @@ public class PeerSystemManager{
 
     
     
-    private byte[] encode(String filename) throws NoSuchAlgorithmException{
-
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        byte[] encodedhash = digest.digest(filename.getBytes(StandardCharsets.UTF_8));
-
-        return encodedhash;
     
-    }
     
     private void rebuilder(Chunk[] chunks) throws IOException{
         File newfile = new File("temp");
