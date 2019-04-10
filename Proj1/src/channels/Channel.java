@@ -8,6 +8,8 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 
+import java.util.Arrays;
+
 public class Channel implements Runnable {
 
     private static final int MAX_SIZE = 65000;
@@ -54,7 +56,10 @@ public class Channel implements Runnable {
 
             try { 
                 this.multicastSocket.receive(packet);
-                this.parentPeer.executeMessageHandler(new Message(packet.getData()));
+                int packet_length = packet.getLength();
+                byte[] temp = packet.getData();
+                byte[] msg_data = Arrays.copyOfRange(temp, 0, packet_length);
+                this.parentPeer.executeMessageHandler(new Message(msg_data));
             } catch (IOException e) {
                 e.printStackTrace();
             }

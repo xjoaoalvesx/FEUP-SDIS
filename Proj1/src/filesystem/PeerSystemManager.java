@@ -82,12 +82,13 @@ public class PeerSystemManager{
 
         int chunksSize = ((int) size) / 64000 + 1;
         Chunk[] chunks = new Chunk[chunksSize];
+        System.out.println(chunksSize);
         
         byte[] buffer = Files.readAllBytes(file.toPath());
         
         int i = 0;
         int c = 0;
-        while(i < (size - 64000)){
+        while(c < (size - 64000)){
             byte[] tempbuf = Arrays.copyOfRange(buffer, i, i+64000);
             
             //TODO Replication Degree 
@@ -103,7 +104,7 @@ public class PeerSystemManager{
 
         //TODO Replication Degree 
         chunks[c] = new Chunk(c, fileId, lastbuf, 1);
-
+        System.out.println(chunks[0].getChunkData().length);
         return chunks;
 
        
@@ -129,6 +130,35 @@ public class PeerSystemManager{
         return hexadecimal;
     
     }
+
+    /*
+        private ArrayList<Chunk> splitIntoChunks(byte[] data) {
+        ArrayList<Chunk> ret = new ArrayList<>();
+
+        int n = data.length / (Chunk.MAX_SIZE) + 1;
+
+        for(int i = 0; i < n; i++) {
+
+            byte[] chunk_data;
+
+            if(i == n-1) {
+                if(data.length % Chunk.MAX_SIZE ==0) {
+                    chunk_data= new byte[0];
+                } else {
+                    chunk_data= Arrays.copyOfRange(data, i*Chunk.MAX_SIZE, i*Chunk.MAX_SIZE + (data.length % Chunk.MAX_SIZE));
+                }
+            } else {
+                chunk_data= Arrays.copyOfRange(data, i*Chunk.MAX_SIZE, i*Chunk.MAX_SIZE + Chunk.MAX_SIZE);
+            }
+
+            Chunk chunk=new Chunk(fileId, i, repDegree, chunk_data);
+            ret.add(chunk);
+        }
+
+        return ret;
+    }
+
+     */
 
 
 /*

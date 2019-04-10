@@ -87,6 +87,8 @@ public class Peer implements RemoteService{
 	}
 
 	public void sendMessageMDB(Message msg) throws IOException{
+		System.out.println("sending in mdb");
+		System.out.println(msg.getMessageInBytes().length);
 		mdb.sendMessage(msg.getMessageInBytes());
 	}
 

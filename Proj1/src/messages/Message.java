@@ -1,6 +1,7 @@
 package messages;
 
 import java.util.Arrays;
+import java.io.*;
 
 public class Message{
 
@@ -25,14 +26,13 @@ public class Message{
     }
     
     public Message(String messageType, String version, String senderId, String fileId, String chunkNo, String replicationDeg){
-        byte[] empty = {};
         this.messageType = messageType;
         this.version = version;
         this.senderId = senderId;
         this.fileId = fileId;
         this.chunkNo = chunkNo;
         this.replicationDeg = replicationDeg;
-        this.body = empty;
+        this.body = null;
         this.createMessage();
     }
     
@@ -46,15 +46,28 @@ public class Message{
         byte[] headerByte = header.getBytes();
         
         int sizeHeader = (int) headerByte.length;
-        int sizeBody = (int) body.length;
+        int sizeBody;
         
-        this.message = new byte[sizeHeader + sizeBody];
-        for (int i = 0; i < sizeHeader; i++){
-            message[i] = headerByte[i];
+        if(this.body == null){
+            sizeBody = 0;
+        }else{
+            sizeBody = (int) this.body.length;
         }
-        for (int i = sizeHeader; i < sizeBody; i++){
-            message[i] = body[i - sizeHeader];
+        
+        
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        if(this.body != null){
+            try{
+                stream.write(headerByte);
+                stream.write(this.body);
+                this.message = stream.toByteArray();
+            }catch (IOException e){
+                System.out.println("Error parsing the message");
+            }
+        }else{
+            this.message = headerByte;
         }
+       
     }
     
     private void decompose(){
@@ -72,7 +85,7 @@ public class Message{
 
         
         byte[] header = Arrays.copyOfRange(this.message, 0, pos);
-        this.body = Arrays.copyOfRange(this.message, pos+3, sizeMessage);
+        this.body = Arrays.copyOfRange(this.message, pos+4, sizeMessage);
         
         String header_s = new String(header);
         this.fillHeader(header_s);
@@ -108,8 +121,6 @@ public class Message{
         this.chunkNo = values[i];
         i++;
         
-        System.out.println(i);
-        System.out.println(values.length);
         i = this.skipSpaces(values, i);
         if(i >= sizeArr){
             return;
