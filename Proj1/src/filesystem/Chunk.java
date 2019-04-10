@@ -3,11 +3,11 @@ package filesystem;
 public class Chunk{
 
     private int chunkID;
-    private byte[] fileID;
+    private String fileID;
     private byte[] chunkData;
     private int replicationDegree;
 
-    public Chunk(int chunkID, byte[] fileID, byte[] chunkData, int replicationDegree){
+    public Chunk(int chunkID, String fileID, byte[] chunkData, int replicationDegree){
         this.chunkID = chunkID;
         this.fileID = fileID;
         this.chunkData = chunkData;
@@ -18,7 +18,7 @@ public class Chunk{
         return chunkID;
     }
 
-    public byte[] getFileID(){
+    public String getFileID(){
         return fileID;
     }
 

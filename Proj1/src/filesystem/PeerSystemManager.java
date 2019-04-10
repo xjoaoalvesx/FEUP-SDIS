@@ -70,9 +70,10 @@ public class PeerSystemManager{
 
     public static Chunk[] divider(String path, File file) throws IOException{
         
-        byte[] fileId = null;
+        String fileId = new String();
         try{
-            fileId = encode(path);
+            String newId = path + ":" + String.valueOf(file.lastModified());
+            fileId = encode(newId);
         } catch (NoSuchAlgorithmException n) {
             System.out.println("Algorithm not found!");
         }
@@ -108,14 +109,24 @@ public class PeerSystemManager{
        
     }
 
-    private static byte[] encode(String filename) throws NoSuchAlgorithmException{
+    private static String encode(String string) throws NoSuchAlgorithmException{
 
         MessageDigest md = MessageDigest.getInstance("SHA-256");
        
 
-        byte[] encodedhash = md.digest(filename.getBytes(StandardCharsets.UTF_8));
+        byte[] encodedhash = md.digest(string.getBytes(StandardCharsets.UTF_8));
 
-        return encodedhash;
+        String hexadecimal = new String();
+
+        for(byte b : encodedhash){
+            String hex = Integer.toHexString(0xff & b);
+            if(hex.length() == 1){
+                hex += '0';
+            }
+            hexadecimal += hex;
+        }
+
+        return hexadecimal;
     
     }
 
