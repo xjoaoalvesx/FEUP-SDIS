@@ -6,6 +6,7 @@ public class Chunk{
     private String fileID;
     private byte[] chunkData;
     private int replicationDegree;
+    private int currentReplication;
 
     public Chunk(int chunkID, String fileID, byte[] chunkData, int replicationDegree){
         this.chunkID = chunkID;

@@ -46,6 +46,11 @@ public class BackupWorker implements Runnable {
     		
     		interval *= 2;
 
+            if (parent_peer.getPeerSystemManager().getDegree(chunk.getFileID(), Integer.toString(chunk.getID())) >= chunk.getReplicationDegree()){
+                System.out.println("Desired degree achieved!");
+                break;
+            }
+
     	}
 
 

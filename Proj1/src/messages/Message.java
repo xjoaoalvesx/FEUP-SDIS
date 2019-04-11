@@ -72,7 +72,7 @@ public class Message{
     
     private void decompose(){
         int pos = 0;
-        int sizeMessage = (int) this.message.length - 1;
+        int sizeMessage = (int) this.message.length;
         byte cr = "\r\n".getBytes()[0];
         byte lf = "\r\n".getBytes()[1];
        

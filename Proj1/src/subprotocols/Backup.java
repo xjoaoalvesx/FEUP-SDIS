@@ -6,6 +6,7 @@ import messages.Message;
 import subprotocols.workers.BackupWorker;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import static filesystem.PeerSystemManager.check;
 
@@ -34,12 +35,24 @@ public class Backup implements Runnable{
     	}catch (IOException e){
     		e.printStackTrace();
     	}
+
+    	ArrayList<Thread> workers = new ArrayList<>(chunks.length);
     	
 
     	for(Chunk chunk : chunks){
     		Thread worker = new Thread (new BackupWorker(this, chunk));
+    		workers.add(worker);
     		worker.start();
     	}
+
+    	try{
+    		for (Thread w : workers) {
+            w.join();
+        	}
+        }catch (InterruptedException e){
+        	System.out.println("Backup: failed joining threads");
+        }
+
 
     	System.out.println("backup run");
     }

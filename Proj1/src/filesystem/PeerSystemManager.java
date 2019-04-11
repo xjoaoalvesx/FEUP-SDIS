@@ -9,19 +9,27 @@ import java.nio.file.Paths;
 import java.io.*;
 import java.security.*;
 import java.util.Arrays;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashSet;
+import java.util.Set;
+
+
 
 
 public class PeerSystemManager{
 
     private Peer parent_peer;
     private String path;
+    private ConcurrentHashMap< String, ConcurrentHashMap<String, Set<String> > > map;
+    
+    
 
     public PeerSystemManager(Peer parent_peer) {
         this.parent_peer = parent_peer;
         this.path = "src/filesystem/Peer" + parent_peer.getId() + "/";
 
         setupFileSystem();
-
+        map = new ConcurrentHashMap<>();
 
     }
 
@@ -41,12 +49,13 @@ public class PeerSystemManager{
     }
 
     public boolean saveFile(String name, String path, byte[] data) throws IOException {
-
         String file_path = path + "/" + name;
         
         if (Files.exists(Paths.get(file_path))) {
             return false;
         }
+
+        //Files.write(file_path, data);
 
         OutputStream out = Files.newOutputStream(Paths.get(file_path));
         out.write(data);
@@ -82,13 +91,12 @@ public class PeerSystemManager{
 
         int chunksSize = ((int) size) / 64000 + 1;
         Chunk[] chunks = new Chunk[chunksSize];
-        System.out.println(chunksSize);
         
         byte[] buffer = Files.readAllBytes(file.toPath());
         
         int i = 0;
         int c = 0;
-        while(c < (size - 64000)){
+        while(i < (size - 64000)){
             byte[] tempbuf = Arrays.copyOfRange(buffer, i, i+64000);
             
             //TODO Replication Degree 
@@ -104,7 +112,7 @@ public class PeerSystemManager{
 
         //TODO Replication Degree 
         chunks[c] = new Chunk(c, fileId, lastbuf, 1);
-        System.out.println(chunks[0].getChunkData().length);
+       // System.out.println(chunks[0].getChunkData().length);
         return chunks;
 
        
@@ -129,6 +137,20 @@ public class PeerSystemManager{
 
         return hexadecimal;
     
+    }
+
+    public void incDegree(String fileId, String chunkNo, String senderId){
+
+        map.putIfAbsent(fileId, new ConcurrentHashMap<>());
+        map.get(fileId).putIfAbsent(chunkNo, new HashSet<String>());
+        map.get(fileId).get(chunkNo).add(senderId);
+
+    }
+
+    public int getDegree(String fileId, String chunkNo){
+
+        return map.get(fileId).get(chunkNo).size();
+        
     }
 
     /*
