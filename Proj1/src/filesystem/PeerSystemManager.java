@@ -65,6 +65,7 @@ public class PeerSystemManager{
     }
 
     public static Chunk[] check(String filepath) throws IOException{
+        System.out.println(filepath);
         File file = new File(filepath);
 	       
         Chunk[] empty = {};	
@@ -116,6 +117,18 @@ public class PeerSystemManager{
         return chunks;
 
        
+    }
+
+    public int getNumChunks(String filepath) {
+
+        File file = new File(filepath);
+
+        long size = file.length();
+
+        int num_chunks = ((int) size) / 64000 + 1;
+
+        return num_chunks;
+
     }
 
     private static String encode(String string) throws NoSuchAlgorithmException{

@@ -3,6 +3,7 @@ package service;
 import channels.Channel;
 import filesystem.PeerSystemManager;
 import subprotocols.Backup;
+import subprotocols.Restore;
 import messages.Message;
 import messages.MessageHandler;
 
@@ -62,7 +63,7 @@ public class Peer implements RemoteService{
 
 			Registry registry = LocateRegistry.getRegistry();
 			String name = "P" + args[1];
-			registry.rebind(name, stub);
+			registry.bind(name, stub);
 			System.out.println("Server ready!");
 		} catch(Exception e){
 			System.out.println("Server exception: " + e.toString());
@@ -104,8 +105,8 @@ public class Peer implements RemoteService{
     }
 
     @Override
-    public void restore() {
-        System.out.println("RESTORE");
+    public void restore(String path) {
+        scheduler.execute(new Restore(this, protocol_version, path));
     }
 
     @Override

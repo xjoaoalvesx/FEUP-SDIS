@@ -105,7 +105,7 @@ public class TestApp implements Runnable {
 
     private void restore_start(){
     	try {
-            stub.restore();
+            stub.restore(this.opnd_1);
         } catch (RemoteException e) {
             System.err.println("Client exception: " + e.toString());
         }
