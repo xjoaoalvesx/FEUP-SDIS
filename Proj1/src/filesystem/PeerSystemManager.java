@@ -282,4 +282,22 @@ public class PeerSystemManager{
             System.out.println("Error removing file: " + path_to_delete);
         }
     }
+
+    public int getAvailableSpace(){ 
+        int used_space = 0; 
+        String peer_directory_backup = this.path + "/backup"; 
+        File backup_dir = new File(peer_directory_backup); 
+        File[] dirs = backup_dir.listFiles(); 
+ 
+        for(File dir : dirs){ 
+            File[] chunks = dir.listFiles(); 
+            for(File chunk : chunks){ 
+                used_space += (int) chunk.length(); 
+            } 
+        } 
+ 
+        this.parent_peer.setAvailableSpace(this.parent_peer.getMaxSpace() - used_space); 
+ 
+        return this.parent_peer.getAvailableSpace(); 
+    } 
 }
