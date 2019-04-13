@@ -23,9 +23,10 @@ public class PeerSystemManager{
 
     private Peer parent_peer;
     private String path;
-    private ConcurrentHashMap< String, ConcurrentHashMap<String, Set<String> > > backup_chunks; //fileId -> (chunkNo -> set(senderId))
+    private ConcurrentHashMap< String, ConcurrentHashMap<String, Set<String> > > chunks_replication_map; //fileId -> chunkNo -> set(senderId)
     private ConcurrentMap< String, String> files_to_restore_by_path; // filePath -> fileID
-    private ConcurrentMap<String, ConcurrentHashMap<Integer, Chunk>> files_restoring;
+    private ConcurrentMap<String, ConcurrentHashMap<Integer, Chunk>> files_restoring; 
+    private ConcurrentMap<String, ConcurrentMap<Integer, Chunk>> backup_chunks; // fileId -> chunkNo -> Chunk
     
 
     public PeerSystemManager(Peer parent_peer) {
@@ -33,10 +34,10 @@ public class PeerSystemManager{
         this.path = "src/filesystem/Peer" + parent_peer.getId() + "/";
 
         setupFileSystem();
-        backup_chunks = new ConcurrentHashMap<>();
+        chunks_replication_map = new ConcurrentHashMap<>();
         files_to_restore_by_path = new ConcurrentHashMap<>();
         files_restoring = new ConcurrentHashMap<>();
-
+        backup_chunks = new ConcurrentHashMap<>();
     }
 
 
@@ -162,15 +163,15 @@ public class PeerSystemManager{
 
     public void incDegree(String fileId, String chunkNo, String senderId){
 
-        backup_chunks.putIfAbsent(fileId, new ConcurrentHashMap<>());
-        backup_chunks.get(fileId).putIfAbsent(chunkNo, new HashSet<String>());
-        backup_chunks.get(fileId).get(chunkNo).add(senderId);
+        chunks_replication_map.putIfAbsent(fileId, new ConcurrentHashMap<>());
+        chunks_replication_map.get(fileId).putIfAbsent(chunkNo, new HashSet<String>());
+        chunks_replication_map.get(fileId).get(chunkNo).add(senderId);
 
     }
 
     public int getDegree(String fileId, String chunkNo){
 
-        return backup_chunks.get(fileId).get(chunkNo).size();
+        return chunks_replication_map.get(fileId).get(chunkNo).size();
         
     }
 
@@ -248,6 +249,33 @@ public class PeerSystemManager{
         return os.toByteArray();
     } 
     
+    public void removeFileToRestore(String path){
+        files_to_restore_by_path.remove(path);
+    }
 
+    public void addBackupChunk(Chunk c){
+        ConcurrentMap<Integer, Chunk> chunks_of_file;
+        chunks_of_file = backup_chunks.getOrDefault(c.getFileID(), new ConcurrentHashMap<>());
+        chunks_of_file.putIfAbsent(c.getID(), c);
+        backup_chunks.putIfAbsent(c.getFileID(), chunks_of_file);
+    }
 
+    public boolean hasChunksofFile(String fileId){
+        return backup_chunks.containsKey(fileId);
+    }
+
+    public ConcurrentMap<Integer,Chunk> removeChunksOfFileBackup(String fileId){
+        return backup_chunks.remove(fileId); // removes key and corresponding values from map , returns V
+    }
+
+    public void removeChunkFromSystem(String fileId, String chunkNo){
+        String path_of_chunk = this.path + "backup/" + fileId + "/" + chunkNo;
+        Path path_to_delete = Paths.get(path_of_chunk);
+
+        try {
+            Files.delete(path_to_delete);
+        } catch (IOException e) {
+            System.out.println("Error removing file: " + path_to_delete);
+        }
+    }
 }

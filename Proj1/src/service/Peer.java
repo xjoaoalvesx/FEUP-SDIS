@@ -4,6 +4,7 @@ import channels.Channel;
 import filesystem.PeerSystemManager;
 import subprotocols.Backup;
 import subprotocols.Restore;
+import subprotocols.Delete;
 import messages.Message;
 import messages.MessageHandler;
 
@@ -110,8 +111,8 @@ public class Peer implements RemoteService{
     }
 
     @Override
-    public void delete() {
-        System.out.println("DELETE");
+    public void delete(String path) {
+        scheduler.execute(new Delete(this, protocol_version, path));
     }
 
     @Override

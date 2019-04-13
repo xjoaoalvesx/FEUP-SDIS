@@ -37,6 +37,7 @@ public class Restore implements Runnable {
 
         if(fileId == null){
             System.out.println("File not available to RESTORE!");
+            return;
         }
 
         parent_peer.getPeerSystemManager().setRestoring(true, this.fileId);

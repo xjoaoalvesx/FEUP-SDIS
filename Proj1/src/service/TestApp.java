@@ -113,7 +113,7 @@ public class TestApp implements Runnable {
 
     private void delete_start(){
     	try {
-            stub.delete();
+            stub.delete(this.opnd_1);
         } catch (RemoteException e) {
             System.err.println("Client exception: " + e.toString());
         }

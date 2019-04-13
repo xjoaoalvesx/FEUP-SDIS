@@ -4,6 +4,7 @@ import service.Peer;
 import messages.Message;
 import filesystem.Chunk;
 import subprotocols.workers.RestoreWorker;
+import subprotocols.workers.DeleteWorker;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ public class MessageHandler implements Runnable {
         message_handlers.add(this::handle_stored);
         message_handlers.add(this::handle_getchunk);
         message_handlers.add(this::handle_chunk);
+        message_handlers.add(this::handle_delete);
 
         switch(msg.getMessageType()){
             case "PUTCHUNK":
@@ -41,6 +43,9 @@ public class MessageHandler implements Runnable {
                 break;   
             case "CHUNK":
                 this.handler_index = 3;
+                break;
+            case "DELETE":
+                this.handler_index = 4;
                 break;
         }
 	}
@@ -103,6 +108,10 @@ public class MessageHandler implements Runnable {
         System.out.println("CHUNK HANDLER");
     }
 
+    private void handle_delete(){
+        Thread worker = new Thread(new DeleteWorker(parent_peer, message));
+        worker.start();
+    }
 
 
     private void saveChunk(String fileId, String chunkNo, int replicationDeg, byte[] chunk, String chunk_path){
@@ -112,6 +121,8 @@ public class MessageHandler implements Runnable {
         } catch (IOException e) {
             System.out.println("Fail saving the chunk!");
         }
+
+        parent_peer.getPeerSystemManager().addBackupChunk(new Chunk(Integer.parseInt(chunkNo), fileId, chunk, replicationDeg));
 
     }
 
