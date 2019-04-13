@@ -4,6 +4,8 @@ import service.Peer;
 import messages.Message;
 import filesystem.Chunk;
 
+import java.io.IOException;
+
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -27,11 +29,16 @@ public class DeleteWorker implements Runnable {
 			return;
 		}
 
+		//removes chunks of current file to delete
 		ConcurrentMap<Integer, Chunk> backup_chunks_map = parent_peer.getPeerSystemManager().removeChunksOfFileBackup(this.fileId);
+		System.out.println(backup_chunks_map.size());
 
-		for (Chunk chunk : backup_chunks_map.values()){
-			parent_peer.getPeerSystemManager().removeChunkFromSystem(chunk.getFileID(), Integer.toString(chunk.getID()));
+		try{
+			parent_peer.getPeerSystemManager().removeDirFromSystem(this.fileId);
+		}catch(IOException e){
+			System.out.println("Error removing folder");
 		}
+		
 
 		System.out.println("DeleteWorker!");
 	}

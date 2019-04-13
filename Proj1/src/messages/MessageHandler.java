@@ -122,6 +122,8 @@ public class MessageHandler implements Runnable {
             System.out.println("Fail saving the chunk!");
         }
 
+        System.out.println("savechunk");
+
         parent_peer.getPeerSystemManager().addBackupChunk(new Chunk(Integer.parseInt(chunkNo), fileId, chunk, replicationDeg));
 
     }
