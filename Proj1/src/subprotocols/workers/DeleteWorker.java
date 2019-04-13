@@ -31,7 +31,7 @@ public class DeleteWorker implements Runnable {
 
 		//removes chunks of current file to delete
 		ConcurrentMap<Integer, Chunk> backup_chunks_map = parent_peer.getPeerSystemManager().removeChunksOfFileBackup(this.fileId);
-		System.out.println(backup_chunks_map.size());
+
 
 		try{
 			parent_peer.getPeerSystemManager().removeDirFromSystem(this.fileId);

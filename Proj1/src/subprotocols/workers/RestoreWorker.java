@@ -5,16 +5,25 @@ import service.Peer;
 import messages.Message;
 import java.io.IOException;
 
+
+import java.util.Random;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
 public class RestoreWorker implements Runnable{
 	
 	private Peer parent_peer;
 	private String version;
 	private Message message;
+    private Random random;
+    private Future scheduledHandler;
 
 	public RestoreWorker(Peer parent_peer, Message m){
 		this.parent_peer = parent_peer;
 		this.version = m.getVersion();
 		this.message = m;
+        this.random = new Random();
+        this.scheduledHandler = null;
 	}
 
 	@Override
@@ -32,11 +41,16 @@ public class RestoreWorker implements Runnable{
 
         Message chunk_m = create_chunk_message(data);
 
-        try{
-    			parent_peer.sendMessageMDR(chunk_m);
-    		}catch (IOException e){
-    			System.out.println("Error: Could not send message to MDR channel(CHUNK)!");
-    		}
+
+
+        scheduledHandler = parent_peer.getExecutor().schedule(() -> {
+            try {
+                parent_peer.sendMessageMDR(chunk_m);
+            } catch (IOException e) {
+                System.out.println("Error: Could not send message to MDR channel(CHUNK)!");
+            }
+        },  random.nextInt(400), TimeUnit.MILLISECONDS);
+
 
     }
 

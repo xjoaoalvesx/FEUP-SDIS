@@ -164,4 +164,8 @@ public class Peer implements RemoteService{
 	public boolean finishedReclaimingSpace(int desired_space){	
 		return desired_space == this.max_space;
 	}
+
+	public ScheduledExecutorService getExecutor(){
+		return scheduler;
+	}
 }

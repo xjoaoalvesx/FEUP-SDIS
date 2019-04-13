@@ -77,7 +77,7 @@ public class MessageHandler implements Runnable {
 
         Message stored = createSTORED(message.getVersion(), message.getSenderId(), fileId, chunkNo);
 
-        // sleep random 0-400ms
+        
         try{
                 parent_peer.sendMessageMC(stored);
             }catch (IOException e){
