@@ -30,7 +30,7 @@ public class BackupWorker implements Runnable {
 
     	Message message = create_putchunk_message(chunk, protocol_version);
 
-    	for(int t = 0; t < 1; t++){
+    	for(int t = 0; t < RETRIES; t++){
 
     		try{
     			parent_peer.sendMessageMDB(message);

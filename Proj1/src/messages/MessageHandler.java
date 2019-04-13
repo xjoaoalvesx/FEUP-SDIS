@@ -2,9 +2,12 @@ package messages;
 
 import service.Peer;
 import messages.Message;
+import filesystem.Chunk;
+import subprotocols.workers.RestoreWorker;
 
 import java.io.IOException;
 import java.util.ArrayList;
+
 
 import static filesystem.PeerSystemManager.createDirectories;
 
@@ -23,6 +26,8 @@ public class MessageHandler implements Runnable {
         message_handlers = new ArrayList<Runnable> ();
         message_handlers.add(this::handle_putchunk);
         message_handlers.add(this::handle_stored);
+        message_handlers.add(this::handle_getchunk);
+        message_handlers.add(this::handle_chunk);
 
         switch(msg.getMessageType()){
             case "PUTCHUNK":
@@ -31,7 +36,12 @@ public class MessageHandler implements Runnable {
             case "STORED":
                 this.handler_index = 1;
                 break;
-
+            case "GETCHUNK":
+                this.handler_index = 2;
+                break;   
+            case "CHUNK":
+                this.handler_index = 3;
+                break;
         }
 	}
 
@@ -72,6 +82,29 @@ public class MessageHandler implements Runnable {
 
     }
 
+    private void handle_stored(){
+        parent_peer.getPeerSystemManager().incDegree(message.getFileId(), message.getChunkNo(), message.getSenderId());
+    }
+
+    private void handle_getchunk(){
+        Thread worker = new Thread(new RestoreWorker(parent_peer, message));
+        worker.start();
+    }
+
+    private void handle_chunk(){
+
+        if(!parent_peer.getPeerSystemManager().getRestoringState(message.getFileId())){
+            return;
+        }
+
+        parent_peer.getPeerSystemManager().addChunkToFileRestore(new Chunk(Integer.parseInt(message.getChunkNo()), message.getFileId()
+            , message.getBody() , 1));
+
+        System.out.println("CHUNK HANDLER");
+    }
+
+
+
     private void saveChunk(String fileId, String chunkNo, int replicationDeg, byte[] chunk, String chunk_path){
 
     	try {
@@ -86,7 +119,5 @@ public class MessageHandler implements Runnable {
         return new Response("STORED", version, senderId, fileId, chunkNo);
     }
 
-    private void handle_stored(){
-        parent_peer.getPeerSystemManager().incDegree(message.getFileId(), message.getChunkNo(), message.getSenderId());
-    }
+    
 }

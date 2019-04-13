@@ -7,6 +7,9 @@ import subprotocols.workers.BackupWorker;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+
 
 import static filesystem.PeerSystemManager.check;
 
@@ -36,6 +39,8 @@ public class Backup implements Runnable{
     		e.printStackTrace();
     	}
 
+        addFileToRestore(this.path, chunks[0].getFileID());
+
     	ArrayList<Thread> workers = new ArrayList<>(chunks.length);
     	
 
@@ -55,6 +60,14 @@ public class Backup implements Runnable{
 
 
     	System.out.println("backup run");
+    }
+
+
+    private void addFileToRestore(String filePath, String fileId){
+
+        parent_peer.getPeerSystemManager().addFileToRestore(filePath, fileId);
+
+
     }
 
     public Peer getParentPeer(){

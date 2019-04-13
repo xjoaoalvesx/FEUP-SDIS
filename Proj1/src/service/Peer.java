@@ -36,7 +36,7 @@ public class Peer implements RemoteService{
 		startChannels(mc_name, mdb_name, mdr_name);
 		manager = new PeerSystemManager(this);
 
-		scheduler = new ScheduledThreadPoolExecutor(6);
+		scheduler = new ScheduledThreadPoolExecutor(8);
 
 		System.out.println("Peer " + id + " entered the network!");
 	}
@@ -63,7 +63,7 @@ public class Peer implements RemoteService{
 
 			Registry registry = LocateRegistry.getRegistry();
 			String name = "P" + args[1];
-			registry.bind(name, stub);
+			registry.rebind(name, stub); // rebind for testing (change to bind if necessary)
 			System.out.println("Server ready!");
 		} catch(Exception e){
 			System.out.println("Server exception: " + e.toString());
@@ -130,5 +130,12 @@ public class Peer implements RemoteService{
 
 	public PeerSystemManager getPeerSystemManager(){
 		return manager;
+	}
+
+	public boolean finishedRestoringFile(String file_path, String fileId){
+		int totalChunks = getPeerSystemManager().getNumChunks(file_path);
+		int chunksRestored = getPeerSystemManager().getChunksRestored(fileId).size();
+
+		return totalChunks == chunksRestored;
 	}
 }

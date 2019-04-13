@@ -10,8 +10,11 @@ import java.io.*;
 import java.security.*;
 import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
 import java.util.HashSet;
 import java.util.Set;
+import java.util.ArrayList;
 
 
 
@@ -20,8 +23,9 @@ public class PeerSystemManager{
 
     private Peer parent_peer;
     private String path;
-    private ConcurrentHashMap< String, ConcurrentHashMap<String, Set<String> > > map;
-    
+    private ConcurrentHashMap< String, ConcurrentHashMap<String, Set<String> > > backup_chunks; //fileId -> (chunkNo -> set(senderId))
+    private ConcurrentMap< String, String> files_to_restore_by_path; // filePath -> fileID
+    private ConcurrentMap<String, ConcurrentHashMap<Integer, Chunk>> files_restoring;
     
 
     public PeerSystemManager(Peer parent_peer) {
@@ -29,7 +33,9 @@ public class PeerSystemManager{
         this.path = "src/filesystem/Peer" + parent_peer.getId() + "/";
 
         setupFileSystem();
-        map = new ConcurrentHashMap<>();
+        backup_chunks = new ConcurrentHashMap<>();
+        files_to_restore_by_path = new ConcurrentHashMap<>();
+        files_restoring = new ConcurrentHashMap<>();
 
     }
 
@@ -133,6 +139,8 @@ public class PeerSystemManager{
 
     private static String encode(String string) throws NoSuchAlgorithmException{
 
+
+
         MessageDigest md = MessageDigest.getInstance("SHA-256");
        
 
@@ -154,78 +162,92 @@ public class PeerSystemManager{
 
     public void incDegree(String fileId, String chunkNo, String senderId){
 
-        map.putIfAbsent(fileId, new ConcurrentHashMap<>());
-        map.get(fileId).putIfAbsent(chunkNo, new HashSet<String>());
-        map.get(fileId).get(chunkNo).add(senderId);
+        backup_chunks.putIfAbsent(fileId, new ConcurrentHashMap<>());
+        backup_chunks.get(fileId).putIfAbsent(chunkNo, new HashSet<String>());
+        backup_chunks.get(fileId).get(chunkNo).add(senderId);
 
     }
 
     public int getDegree(String fileId, String chunkNo){
 
-        return map.get(fileId).get(chunkNo).size();
+        return backup_chunks.get(fileId).get(chunkNo).size();
         
     }
 
-    /*
-        private ArrayList<Chunk> splitIntoChunks(byte[] data) {
-        ArrayList<Chunk> ret = new ArrayList<>();
-
-        int n = data.length / (Chunk.MAX_SIZE) + 1;
-
-        for(int i = 0; i < n; i++) {
-
-            byte[] chunk_data;
-
-            if(i == n-1) {
-                if(data.length % Chunk.MAX_SIZE ==0) {
-                    chunk_data= new byte[0];
-                } else {
-                    chunk_data= Arrays.copyOfRange(data, i*Chunk.MAX_SIZE, i*Chunk.MAX_SIZE + (data.length % Chunk.MAX_SIZE));
-                }
-            } else {
-                chunk_data= Arrays.copyOfRange(data, i*Chunk.MAX_SIZE, i*Chunk.MAX_SIZE + Chunk.MAX_SIZE);
-            }
-
-            Chunk chunk=new Chunk(fileId, i, repDegree, chunk_data);
-            ret.add(chunk);
-        }
-
-        return ret;
-    }
-
-     */
-
-
-/*
-
-    private void check() throws IOException, NoSuchAlgorithmException{
-        file = new File(filepath);
-
-        if(file.isFile()){
-            this.divider();
-        }else{
-            System.out.println("Error reading the file");
+    public void addFileToRestore(String filePath, String fileId){
+        try{
+            files_to_restore_by_path.put(filePath, fileId);
+        }catch (NullPointerException e){
+            e.printStackTrace();
         }
     }
 
-    
-    
-    
-    
-    private void rebuilder(Chunk[] chunks) throws IOException{
-        File newfile = new File("temp");
-        if(newfile.exists()){
-            newfile.delete();
-        }
-        newfile.createNewFile();
+    public String getFileIdbyPath(String filePath) {
+        return files_to_restore_by_path.get(filePath);
+    }
+
+    public static byte[] loadDataFromPath(String path){
         
-        try (FileOutputStream stream = new FileOutputStream("temp")) {
-            for(Chunk c : chunks){
-                stream.write(c.getChunkData());
-            }
-            stream.close();
+        byte[] getBytes = {};
+
+        try {
+            File file = new File(path);
+            getBytes = new byte[(int) file.length()];
+            InputStream is = new FileInputStream(file);
+            is.read(getBytes);
+            is.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return getBytes;
+    }
+
+    public byte[] getChunkData(String fileId, String chunkNo){
+        String p = path + "backup/" + fileId + "/" + chunkNo;
+        return loadDataFromPath(p);
+    }
+
+    public void setRestoring(boolean restoring, String fileId){
+        if(restoring){
+            files_restoring.putIfAbsent(fileId, new ConcurrentHashMap<>());
+        }
+        else {
+            files_restoring.remove(fileId);
         }
     }
-    */
+
+    public boolean getRestoringState(String fileId){
+        return files_restoring.containsKey(fileId);
+    }
+
+    public ConcurrentMap<Integer,Chunk> getChunksRestored(String fileId){
+        return files_restoring.get(fileId);
+    }
+
+    public void addChunkToFileRestore(Chunk chunk){
+        files_restoring.get(chunk.getFileID()).putIfAbsent(chunk.getID(), chunk);
+    }
+
+    
+
+    public static byte[] joinChunks(ArrayList<Chunk> chunks){
+
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+
+        for (int i = 0; i < chunks.size(); i++) {
+            try {
+                os.write(chunks.get(i).getChunkData());
+            } catch (IOException e) {
+                System.out.println("Failed joining chunks");
+            }
+        }
+
+        return os.toByteArray();
+    } 
+    
+
 
 }
