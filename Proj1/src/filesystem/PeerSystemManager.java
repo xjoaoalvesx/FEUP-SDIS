@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
 import java.io.*;
 import java.security.*;
 import java.util.Arrays;
@@ -15,6 +16,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.ArrayList;
+
 
 
 
@@ -223,6 +225,8 @@ public class PeerSystemManager{
         return files_restoring.containsKey(fileId);
     }
 
+    
+
     public ConcurrentMap<Integer,Chunk> getChunksRestored(String fileId){
         return files_restoring.get(fileId);
     }
@@ -247,6 +251,25 @@ public class PeerSystemManager{
 
         return os.toByteArray();
     } 
+    
+    public int getAvailableSpace(){
+        int used_space = 0;
+        String peer_directory_backup = this.path + "/backup";
+        File backup_dir = new File(peer_directory_backup);
+        File[] dirs = backup_dir.listFiles();
+
+        for(File dir : dirs){
+            File[] chunks = dir.listFiles();
+            for(File chunk : chunks){
+                used_space += (int) chunk.length();
+            }
+        }
+
+        this.parent_peer.setAvailableSpace(this.parent_peer.getMaxSpace() - used_space);
+
+        return this.parent_peer.getAvailableSpace();
+    }
+
     
 
 

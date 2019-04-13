@@ -25,6 +25,8 @@ public class Peer implements RemoteService{
 	private Channel mdb;
 	private Channel mdr;
 	private PeerSystemManager manager;
+	private int max_space;
+	private int available_space;
 
 	private ScheduledExecutorService scheduler;
 
@@ -37,6 +39,9 @@ public class Peer implements RemoteService{
 		manager = new PeerSystemManager(this);
 
 		scheduler = new ScheduledThreadPoolExecutor(8);
+
+		max_space = 9600000; // space for 150 chunks
+		available_space = 9600000;
 
 		System.out.println("Peer " + id + " entered the network!");
 	}
@@ -128,6 +133,22 @@ public class Peer implements RemoteService{
 		return this.id;
 	}
 
+	public int getMaxSpace(){
+		return this.max_space;
+	}
+
+	public int getAvailableSpace(){
+		return this.available_space;
+	}
+
+	public void setMaxSpace(int space){
+		this.max_space = space;
+	}
+
+	public void setAvailableSpace(int space){
+		this.available_space = space;
+	}
+
 	public PeerSystemManager getPeerSystemManager(){
 		return manager;
 	}
@@ -137,5 +158,9 @@ public class Peer implements RemoteService{
 		int chunksRestored = getPeerSystemManager().getChunksRestored(fileId).size();
 
 		return totalChunks == chunksRestored;
+	}
+
+	public boolean finishedReclaimingSpace(int desired_space){	
+		return desired_space == this.max_space;
 	}
 }
