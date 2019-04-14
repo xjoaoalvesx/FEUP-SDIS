@@ -190,6 +190,9 @@ public class PeerSystemManager{
         int[] temp = replication_degree_map.get(key);
         temp[1] = calculateDegree(fileId, chunkNo);
         replication_degree_map.put(key, temp);
+        System.out.print("REP :");
+        System.out.println(temp[1]);
+        
     }
 
     public int calculateDegree(String fileId, String chunkNo){
@@ -358,6 +361,7 @@ public class PeerSystemManager{
 
     public void removeChunkFromMap(String fileId, String chunkNo, String senderId){
         this.chunks_replication_map.get(fileId).get(chunkNo).remove(senderId);
+        this.updateDegree(fileId, chunkNo);
     }
 
     public void removeChunkFromPeer(String fileId, String chunkNo){
@@ -394,11 +398,17 @@ public class PeerSystemManager{
     }
 
     public int checkReplicationDegree(String fileId, String chunkNo){
-        return this.replication_degree_map.get(fileId + chunkNo)[0] - this.replication_degree_map.get(fileId + chunkNo)[1];
+        return this.replication_degree_map.get(fileId + chunkNo)[1] - this.replication_degree_map.get(fileId + chunkNo)[0];
     }
 
     public boolean hasChunk(String fileId, String chunkNo){
-        return backup_chunks.get(fileId).containsKey(Integer.parseInt(chunkNo));
+        boolean one;
+        try {
+            one = backup_chunks.get(fileId).containsKey(Integer.parseInt(chunkNo));
+            return one;
+        } catch (Exception e) {
+            return false;
+        } 
     }
 
     public void publishInformation(){

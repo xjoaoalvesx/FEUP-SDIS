@@ -34,7 +34,8 @@ public class ReclaimWorker implements Runnable {
 		this.parent_peer.getPeerSystemManager().removeChunkFromMap(fileId, chunkNo, message.getSenderId());
 
 		int rep = this.parent_peer.getPeerSystemManager().checkReplicationDegree(fileId, chunkNo);
-
+		System.out.print("rep: ");
+		System.out.println(rep);
 		if(rep < 0){
 			rep = 0 - rep;
 			byte[] data = this.parent_peer.getPeerSystemManager().getChunkData(fileId, chunkNo);

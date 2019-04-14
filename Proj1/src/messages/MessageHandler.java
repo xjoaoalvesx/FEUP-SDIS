@@ -96,7 +96,7 @@ public class MessageHandler implements Runnable {
                         if(chunk_save){
                             try {
                                 parent_peer.getPeerSystemManager().storeDegree(fileId, chunkNo, replicationDeg);
-                                parent_peer.getPeerSystemManager().incDegree(fileId, chunkNo, String.valueOf(senderId));
+                                parent_peer.getPeerSystemManager().incDegree(fileId, chunkNo, String.valueOf(this.parent_peer.getId()));
                                 System.out.println("sending stored");
                                 parent_peer.sendMessageMC(stored);
                             } catch (IOException e) {
@@ -116,7 +116,7 @@ public class MessageHandler implements Runnable {
             if(s){
                 try {
                     parent_peer.getPeerSystemManager().storeDegree(fileId, chunkNo, replicationDeg);
-                    parent_peer.getPeerSystemManager().incDegree(fileId, chunkNo, String.valueOf(senderId));
+                    parent_peer.getPeerSystemManager().incDegree(fileId, chunkNo, String.valueOf(this.parent_peer.getId()));
                     parent_peer.sendMessageMC(stored);
                 } catch (IOException e) {
                     System.out.println("Error: Could not send message(STORED) to MC channel!");
@@ -158,8 +158,10 @@ public class MessageHandler implements Runnable {
     }
 
     private void handle_removed(){
-        Thread worker = new Thread(new ReclaimWorker(parent_peer, message));
-        worker.start();
+        Executors.newSingleThreadScheduledExecutor().schedule(() -> {
+            Thread worker = new Thread(new ReclaimWorker(parent_peer, message));
+            worker.start();
+        },  random.nextInt(400), TimeUnit.MILLISECONDS);
     }
 
     private boolean saveChunk(String fileId, String chunkNo, int replicationDeg, byte[] chunk, String chunk_path){
