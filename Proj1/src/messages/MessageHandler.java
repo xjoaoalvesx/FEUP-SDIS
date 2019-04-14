@@ -87,8 +87,9 @@ public class MessageHandler implements Runnable {
 
         Message stored = createSTORED(message.getVersion(), Integer.toString(parent_peer.getId()), fileId, chunkNo);
         System.out.println(message.getVersion());
+        
         if(message.getVersion().equals(ENHANCEMENT)){
-            System.out.println("ENHANCEMENT");
+
             Executors.newSingleThreadScheduledExecutor().schedule(() -> {
                 if (parent_peer.getPeerSystemManager().calculateDegree(fileId, chunkNo) < replicationDeg){
                     createDirectories(chunk_path);

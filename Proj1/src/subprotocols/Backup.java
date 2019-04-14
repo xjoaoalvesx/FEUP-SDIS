@@ -38,8 +38,6 @@ public class Backup implements Runnable{
     		e.printStackTrace();
     	}
 
-        addFileToRestore(this.path, chunks[0].getFileID());
-
     	ArrayList<Thread> workers = new ArrayList<>(chunks.length);
     	
 
@@ -58,7 +56,7 @@ public class Backup implements Runnable{
         	System.out.println("Backup: failed joining threads");
         }
 
-
+        addFileToRestore(this.path, chunks[0].getFileID());
     	System.out.println("backup run");
     }
 
