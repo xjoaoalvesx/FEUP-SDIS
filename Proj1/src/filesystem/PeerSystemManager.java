@@ -77,21 +77,20 @@ public class PeerSystemManager{
         return true;   
     }
 
-    public static Chunk[] check(String filepath) throws IOException{
+    public static Chunk[] check(String filepath, int repD) throws IOException{
         System.out.println(filepath);
         File file = new File(filepath);
-	       
         Chunk[] empty = {};	
 
         if(file.isFile()){
-            return divider(filepath, file);
+            return divider(filepath, file, repD);
         }else{
             System.out.println("Error reading the file");
             return empty;
         }
     }
 
-    public static Chunk[] divider(String path, File file) throws IOException{
+    public static Chunk[] divider(String path, File file, int repD) throws IOException{
         
         String fileId = new String();
         try{
@@ -113,8 +112,7 @@ public class PeerSystemManager{
         while(i < (size - 64000)){
             byte[] tempbuf = Arrays.copyOfRange(buffer, i, i+64000);
             
-            //TODO Replication Degree 
-            chunks[c] = new Chunk(c, fileId, tempbuf, 1);
+            chunks[c] = new Chunk(c, fileId, tempbuf, repD);
             
             i = i + 64000;
             c++;
@@ -125,7 +123,7 @@ public class PeerSystemManager{
         byte[] lastbuf = Arrays.copyOfRange(buffer, i, i+lastSize);     
 
         //TODO Replication Degree 
-        chunks[c] = new Chunk(c, fileId, lastbuf, 1);
+        chunks[c] = new Chunk(c, fileId, lastbuf, repD);
        // System.out.println(chunks[0].getChunkData().length);
         return chunks;
 
@@ -168,18 +166,24 @@ public class PeerSystemManager{
     }
 
     public void incDegree(String fileId, String chunkNo, String senderId){
-
         chunks_replication_map.putIfAbsent(fileId, new ConcurrentHashMap<>());
         chunks_replication_map.get(fileId).putIfAbsent(chunkNo, new HashSet<String>());
         chunks_replication_map.get(fileId).get(chunkNo).add(senderId);
-
     }
 
     public int getDegree(String fileId, String chunkNo){
 
-        return chunks_replication_map.get(fileId).get(chunkNo).size();
-        
-    }
+        if (chunks_replication_map.get(fileId) == null){
+            System.out.println("null");
+            return 0;
+        }
+        else if(chunks_replication_map.get(fileId).get(chunkNo) == null){
+            return 0;
+        }
+            
+        else  return chunks_replication_map.get(fileId).get(chunkNo).size();
+        }
+
 
     public void addFileToRestore(String filePath, String fileId){
         try{
@@ -204,7 +208,9 @@ public class PeerSystemManager{
             is.read(getBytes);
             is.close();
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            // if doesnt exists byte[] = null;
+            byte[] r = null;
+            return r;
         } catch (IOException e) {
             e.printStackTrace();
         }

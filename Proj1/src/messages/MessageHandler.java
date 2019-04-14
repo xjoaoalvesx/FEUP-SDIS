@@ -8,6 +8,11 @@ import subprotocols.workers.DeleteWorker;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Random;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Executors;
+
 
 
 import static filesystem.PeerSystemManager.createDirectories;
@@ -19,10 +24,13 @@ public class MessageHandler implements Runnable {
 	private Message message;
     private ArrayList<Runnable> message_handlers;
     private int handler_index;
+    private Future scheduledHandler = null;
+    private Random random;
 
 	public MessageHandler(Peer parent_peer, Message msg){
 		this.parent_peer = parent_peer;
 		this.message = msg;
+        this.random = new Random();
 
         message_handlers = new ArrayList<Runnable> ();
         message_handlers.add(this::handle_putchunk);
@@ -66,28 +74,50 @@ public class MessageHandler implements Runnable {
     	}
 
     	byte[] chunk = message.getBody();
-        System.out.println("received msg");
-        System.out.println(message.getMessageInBytes().length);
 
     	String chunk_path = "peers/Peer" + this.parent_peer.getId() + "/backup/" + fileId;
 
-    	createDirectories(chunk_path);
+    	
+        // normal
+    	//saveChunk(fileId, chunkNo, replicationDeg, chunk, chunk_path);
 
-    	saveChunk(fileId, chunkNo, replicationDeg, chunk, chunk_path);
+        Message stored = createSTORED(message.getVersion(), Integer.toString(parent_peer.getId()), fileId, chunkNo);
 
-        Message stored = createSTORED(message.getVersion(), message.getSenderId(), fileId, chunkNo);
-
+        //Executors.newSingleThreadScheduledExecutor().schedule(() -> {
+        //    try {
+        //        parent_peer.sendMessageMC(stored);
+        //    } catch (IOException e) {
+        //        System.out.println("Error: Could not send message(STORED) to MC channel!");
+        //    }
+        //},  random.nextInt(400), TimeUnit.MILLISECONDS);
+        //normal
         
-        try{
-                parent_peer.sendMessageMC(stored);
-            }catch (IOException e){
-                System.out.println("Error: Could not send message(STORED) to MC channel!");
+        //enhancement
+        
+        Executors.newSingleThreadScheduledExecutor().schedule(() -> {
+            if (parent_peer.getPeerSystemManager().getDegree(fileId, chunkNo) < replicationDeg){
+                createDirectories(chunk_path);
+                boolean chunk_save = saveChunk(fileId, chunkNo, replicationDeg, chunk, chunk_path);
+                    if(chunk_save){
+                        try {
+                            System.out.println("sending stored");
+                            parent_peer.sendMessageMC(stored);
+                        } catch (IOException e) {
+                        System.out.println("Error: Could not send message(STORED) to MC channel!");
+                        }
+                    }
             }
+        }, random.nextInt(400), TimeUnit.MILLISECONDS);
+            
 
+
+
+        //enhancement
 
     }
 
     private void handle_stored(){
+        System.out.println(message.getSenderId() + " senderid");
         parent_peer.getPeerSystemManager().incDegree(message.getFileId(), message.getChunkNo(), message.getSenderId());
     }
 
@@ -114,18 +144,19 @@ public class MessageHandler implements Runnable {
     }
 
 
-    private void saveChunk(String fileId, String chunkNo, int replicationDeg, byte[] chunk, String chunk_path){
+    private boolean saveChunk(String fileId, String chunkNo, int replicationDeg, byte[] chunk, String chunk_path){
 
     	try {
     		parent_peer.getPeerSystemManager().saveFile(chunkNo, chunk_path, chunk);
         } catch (IOException e) {
             System.out.println("Fail saving the chunk!");
+            return false;
         }
 
         System.out.println("savechunk");
 
         parent_peer.getPeerSystemManager().addBackupChunk(new Chunk(Integer.parseInt(chunkNo), fileId, chunk, replicationDeg));
-
+        return true;
     }
 
     private Message createSTORED(String version, String senderId, String fileId, String chunkNo){

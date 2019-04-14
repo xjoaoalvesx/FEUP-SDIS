@@ -39,6 +39,10 @@ public class RestoreWorker implements Runnable{
 
         byte[] data = parent_peer.getPeerSystemManager().getChunkData(fileId, chunkNo);
 
+        if(data == null){
+            System.out.println("File was not found in current Peer data");
+            return;
+        }
         Message chunk_m = create_chunk_message(data);
 
 

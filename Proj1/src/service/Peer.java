@@ -52,7 +52,7 @@ public class Peer implements RemoteService{
 
 		if(args.length != 6){
 			System.out.println("Peer: java -classpath bin service.Peer" + " <protocol_version> <peer_id> <service_access_point>" + 
-							   " <mc> <mdb> <mdr>");
+							   " <mc/port> <mdb/port> <mdr/port>");
 			return;
 		}
 

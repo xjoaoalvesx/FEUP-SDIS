@@ -12,7 +12,7 @@ public class TestApp implements Runnable {
 	private String peer_ap;
     private String sub_protocol;
     private String opnd_1;
-    private String opnd_2;
+    private Integer opnd_2;
    	private ArrayList<Runnable> protocol_handlers;
    	private int sub_protocol_index;
 
@@ -23,7 +23,7 @@ public class TestApp implements Runnable {
 		this.peer_ap = peer_ap;
 		this.sub_protocol = sub_protocol;
 		this.opnd_1 = opnd_1;
-		this.opnd_2 = opnd_2;
+		this.opnd_2 = Integer.parseInt(opnd_2);
 
 		protocol_handlers = new ArrayList<Runnable> ();
 		protocol_handlers.add(this::backup_start);
@@ -97,7 +97,7 @@ public class TestApp implements Runnable {
 
     private void backup_start(){
     	try {
-            stub.backup(this.opnd_1, Integer.parseInt(this.opnd_2));
+            stub.backup(this.opnd_1, this.opnd_2);
         } catch (RemoteException e) {
             System.err.println("Client exception: " + e.toString());
         }

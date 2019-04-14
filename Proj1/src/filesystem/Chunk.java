@@ -16,19 +16,19 @@ public class Chunk{
     }
 
     public int getID(){
-        return chunkID;
+        return this.chunkID;
     }
 
     public String getFileID(){
-        return fileID;
+        return this.fileID;
     }
 
     public byte[] getChunkData(){
-        return chunkData;
+        return this.chunkData;
     }
 
     public int getReplicationDegree(){
-        return replicationDegree;
+        return this.replicationDegree;
     }
     
     public int getSize(){

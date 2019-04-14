@@ -25,7 +25,6 @@ public class Backup implements Runnable{
 		this.version = version;
 		this.path = path;
 		this.replicationDegree = replicationDegree;
-
 		System.out.println("The Backup Started!");
 	}
 
@@ -34,7 +33,7 @@ public class Backup implements Runnable{
 
     	Chunk[] chunks = null;
     	try{
-    		chunks = check(this.path);
+    		chunks = check(this.path, this.replicationDegree);
     	}catch (IOException e){
     		e.printStackTrace();
     	}
