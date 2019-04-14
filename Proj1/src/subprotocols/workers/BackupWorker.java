@@ -20,6 +20,7 @@ public class BackupWorker implements Runnable {
 		this.parent_peer = backup.getParentPeer();
 		this.protocol_version = backup.getProtocolVersion();
 
+
 	}
 
 	@Override
@@ -28,7 +29,7 @@ public class BackupWorker implements Runnable {
 
     	int interval = 1000; // 1 second
 
-    	Message message = create_putchunk_message(chunk, protocol_version);
+		Message message = create_putchunk_message(chunk, protocol_version);
 
     	for(int t = 0; t < RETRIES; t++){
 
@@ -44,17 +45,17 @@ public class BackupWorker implements Runnable {
     			System.out.println(e.getMessage());
     		}
     		
-    		interval *= 2;
-
-            if (parent_peer.getPeerSystemManager().getDegree(chunk.getFileID(), Integer.toString(chunk.getID())) >= chunk.getReplicationDegree()){
+			interval *= 2;
+			String key = chunk.getFileID() + String.valueOf(chunk.getID());
+            if (parent_peer.getPeerSystemManager().getCurrentDegree(key) >= parent_peer.getPeerSystemManager().getDesiredDegree(key)){
                 System.out.println("Desired degree achieved!");
                 break;
-            }
+			}
 
-    	}
-
+		}	
 
     }
+
 
 
     private Message create_putchunk_message(Chunk chunk, String version){

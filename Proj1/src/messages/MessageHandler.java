@@ -5,6 +5,7 @@ import messages.Message;
 import filesystem.Chunk;
 import subprotocols.workers.RestoreWorker;
 import subprotocols.workers.DeleteWorker;
+import subprotocols.workers.ReclaimWorker;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,6 +28,8 @@ public class MessageHandler implements Runnable {
     private Future scheduledHandler = null;
     private Random random;
     private static final String ENHANCEMENT = "2.0";
+    private String respond_fileId = null;
+    private String respond_chunkNo = null;
 
 	public MessageHandler(Peer parent_peer, Message msg){
 		this.parent_peer = parent_peer;
@@ -39,6 +42,7 @@ public class MessageHandler implements Runnable {
         message_handlers.add(this::handle_getchunk);
         message_handlers.add(this::handle_chunk);
         message_handlers.add(this::handle_delete);
+        message_handlers.add(this::handle_removed);
 
         switch(msg.getMessageType()){
             case "PUTCHUNK":
@@ -55,6 +59,9 @@ public class MessageHandler implements Runnable {
                 break;
             case "DELETE":
                 this.handler_index = 4;
+                break;
+            case "REMOVED":
+                this.handler_index = 5;
                 break;
         }
 	}
@@ -83,11 +90,13 @@ public class MessageHandler implements Runnable {
         if(message.getVersion().equals(ENHANCEMENT)){
             System.out.println("ENHANCEMENT");
             Executors.newSingleThreadScheduledExecutor().schedule(() -> {
-                if (parent_peer.getPeerSystemManager().getDegree(fileId, chunkNo) < replicationDeg){
+                if (parent_peer.getPeerSystemManager().calculateDegree(fileId, chunkNo) < replicationDeg){
                     createDirectories(chunk_path);
                     boolean chunk_save = saveChunk(fileId, chunkNo, replicationDeg, chunk, chunk_path);
                         if(chunk_save){
                             try {
+                                parent_peer.getPeerSystemManager().storeDegree(fileId, chunkNo, replicationDeg);
+                                parent_peer.getPeerSystemManager().incDegree(fileId, chunkNo, String.valueOf(senderId));
                                 System.out.println("sending stored");
                                 parent_peer.sendMessageMC(stored);
                             } catch (IOException e) {
@@ -102,12 +111,17 @@ public class MessageHandler implements Runnable {
             createDirectories(chunk_path);
         // normal
             boolean s = saveChunk(fileId, chunkNo, replicationDeg, chunk, chunk_path);
+            
 
             Executors.newSingleThreadScheduledExecutor().schedule(() -> {
-            try {
-               parent_peer.sendMessageMC(stored);
-            } catch (IOException e) {
-               System.out.println("Error: Could not send message(STORED) to MC channel!");
+            if(s){
+                try {
+                    parent_peer.getPeerSystemManager().storeDegree(fileId, chunkNo, replicationDeg);
+                    parent_peer.getPeerSystemManager().incDegree(fileId, chunkNo, String.valueOf(senderId));
+                    parent_peer.sendMessageMC(stored);
+                } catch (IOException e) {
+                    System.out.println("Error: Could not send message(STORED) to MC channel!");
+                }
             }
             },  random.nextInt(400), TimeUnit.MILLISECONDS);
         //normal
@@ -120,13 +134,20 @@ public class MessageHandler implements Runnable {
     }
 
     private void handle_getchunk(){
-        Thread worker = new Thread(new RestoreWorker(parent_peer, message));
-        worker.start();
+        Executors.newSingleThreadScheduledExecutor().schedule(() -> {
+            Thread worker = new Thread(new RestoreWorker(parent_peer, message, this.respond_fileId, this.respond_chunkNo));
+            worker.start();
+            this.respond_chunkNo = null;
+            this.respond_fileId = null;
+        },  random.nextInt(400), TimeUnit.MILLISECONDS);
+        
     }
 
     private void handle_chunk(){
 
         if(!parent_peer.getPeerSystemManager().getRestoringState(message.getFileId())){
+            this.respond_fileId = message.getFileId();
+            this.respond_chunkNo = message.getChunkNo();
             return;
         }
 
@@ -141,6 +162,10 @@ public class MessageHandler implements Runnable {
         worker.start();
     }
 
+    private void handle_removed(){
+        Thread worker = new Thread(new ReclaimWorker(parent_peer, message));
+        worker.start();
+    }
 
     private boolean saveChunk(String fileId, String chunkNo, int replicationDeg, byte[] chunk, String chunk_path){
 

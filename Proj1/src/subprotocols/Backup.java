@@ -44,6 +44,7 @@ public class Backup implements Runnable{
     	
 
     	for(Chunk chunk : chunks){
+			this.parent_peer.getPeerSystemManager().storeDegree(chunk.getFileID(), String.valueOf(chunk.getID()), this.replicationDegree);
     		Thread worker = new Thread (new BackupWorker(this, chunk));
     		workers.add(worker);
     		worker.start();
@@ -75,7 +76,8 @@ public class Backup implements Runnable{
 
     public String getProtocolVersion(){
     	return version;
-    }
+	}
+	
 
     
 

@@ -17,13 +17,18 @@ public class RestoreWorker implements Runnable{
 	private Message message;
     private Random random;
     private Future scheduledHandler;
+    private String received_fileId;
+    private String received_chunkNo;
 
-	public RestoreWorker(Peer parent_peer, Message m){
+
+	public RestoreWorker(Peer parent_peer, Message m, String received_fileId, String received_chunkNo){
 		this.parent_peer = parent_peer;
 		this.version = m.getVersion();
 		this.message = m;
         this.random = new Random();
         this.scheduledHandler = null;
+        this.received_fileId = received_fileId;
+        this.received_chunkNo = received_chunkNo;
 	}
 
 	@Override
@@ -31,6 +36,11 @@ public class RestoreWorker implements Runnable{
 
     	if (Integer.parseInt(message.getSenderId()) == parent_peer.getId()) {
             System.out.println("Ignoring CHUNKs from own files");
+            return;
+        }
+
+        if(message.getFileId().equals(this.received_fileId) && message.getChunkNo().equals(this.received_chunkNo)){
+            System.out.print("Another peer already answered");
             return;
         }
 
@@ -45,15 +55,12 @@ public class RestoreWorker implements Runnable{
         }
         Message chunk_m = create_chunk_message(data);
 
-
-
-        scheduledHandler = parent_peer.getExecutor().schedule(() -> {
-            try {
-                parent_peer.sendMessageMDR(chunk_m);
-            } catch (IOException e) {
-                System.out.println("Error: Could not send message to MDR channel(CHUNK)!");
-            }
-        },  random.nextInt(400), TimeUnit.MILLISECONDS);
+        try {
+           parent_peer.sendMessageMDR(chunk_m);
+        } catch (IOException e) {
+            System.out.println("Error: Could not send message to MDR channel(CHUNK)!");
+        }
+  
 
 
     }
