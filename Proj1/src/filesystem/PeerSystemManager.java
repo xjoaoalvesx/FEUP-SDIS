@@ -400,4 +400,15 @@ public class PeerSystemManager{
     public boolean hasChunk(String fileId, String chunkNo){
         return backup_chunks.get(fileId).containsKey(Integer.parseInt(chunkNo));
     }
+
+    public void publishInformation(){
+        System.out.println("Files provided to be backed up:");
+        int i = 1;
+        for(String s : chunks_replication_map.keySet()){
+            if(chunks_replication_map.get(s) != null){
+                System.out.println("     File " + String.valueOf(i) + "(replication degree = " + String.valueOf(this.getDesiredDegree(s+"0")) + "):");            
+            }
+            i++;
+        }
+    }
 }
