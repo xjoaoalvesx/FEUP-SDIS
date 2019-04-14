@@ -73,9 +73,10 @@ public class MessageHandler implements Runnable {
     	int senderId = Integer.parseInt(message.getSenderId());
     	String fileId = message.getFileId();
     	String chunkNo = message.getChunkNo();
-    	int replicationDeg = Integer.parseInt(message.getReplicationDeg());
+        int replicationDeg = Integer.parseInt(message.getReplicationDeg());
+        
 
-    	if (senderId == this.parent_peer.getId()){
+    	if (senderId == this.parent_peer.getId() || this.parent_peer.getPeerSystemManager().fileOriginatedFromPeer(fileId)){
     		return;
     	}
 
@@ -110,7 +111,6 @@ public class MessageHandler implements Runnable {
             createDirectories(chunk_path);
         // normal
             boolean s = saveChunk(fileId, chunkNo, replicationDeg, chunk, chunk_path);
-            
 
             Executors.newSingleThreadScheduledExecutor().schedule(() -> {
             if(s){
@@ -164,7 +164,7 @@ public class MessageHandler implements Runnable {
 
     private boolean saveChunk(String fileId, String chunkNo, int replicationDeg, byte[] chunk, String chunk_path){
 
-    	try {
+        try {
     		parent_peer.getPeerSystemManager().saveFile(chunkNo, chunk_path, chunk);
         } catch (IOException e) {
             System.out.println("Fail saving the chunk!");
