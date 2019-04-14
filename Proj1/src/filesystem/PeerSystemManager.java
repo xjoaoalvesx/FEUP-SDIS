@@ -416,7 +416,21 @@ public class PeerSystemManager{
 
         String allInfo = "";
 
-        allInfo += "\nBackup Files:\n";
+        allInfo += "\nBackup Chunks:\n";
+
+        for(Map.Entry<String, ConcurrentHashMap<String, Set<String>>> file : chunks_replication_map.entrySet()){
+            allInfo += "\nFile: " + file.getKey() ;
+            for(Map.Entry<String, Set<String>> chunkMap : file.getValue().entrySet()){
+                
+                String chunkNo = chunkMap.getKey();
+                String temp = file.getKey() + chunkNo;
+                allInfo += "\n chunkId: " + chunkNo +
+                           "\n desired replication degree : " + getDesiredDegree(temp) +
+                           "\n perceived replication degree : " + getCurrentDegree(temp);
+            }
+        }
+
+        allInfo += "\n\nStored Chunks:\n";
 
         for(Map.Entry<String, ConcurrentMap<Integer, Chunk>> file : backup_chunks.entrySet()){
             allInfo += "\nFile: " + file.getKey() ;
@@ -429,6 +443,11 @@ public class PeerSystemManager{
                            "\n perceived replication degree : " + getCurrentDegree(temp);
             }
         }
+
+
+        allInfo += "\n\nPeer space usage:\n";
+        allInfo += "\n Max space: " + String.valueOf((float) this.parent_peer.getMaxSpace() / 1000) + " KB";
+        allInfo += "\n Free space: " + String.valueOf((float) this.parent_peer.getAvailableSpace() / 1000) + " KB";
 
         System.out.println(allInfo);
     }
