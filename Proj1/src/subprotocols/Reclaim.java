@@ -32,17 +32,18 @@ public class Reclaim implements Runnable {
 	@Override
     public void run(){
 
-        int actual_size = this.parent_peer.getMaxSpace();
+        int current_max_size = this.parent_peer.getMaxSpace();
+        int current_free_space = this.parent_peer.getPeerSystemManager().setAvailableSpace();
 
-        if(this.desired_size > actual_size){
+        if(this.desired_size > current_max_size){
             this.parent_peer.setMaxSpace(this.desired_size);
             parent_peer.getPeerSystemManager().setAvailableSpace();
-        }else if (this.desired_size < actual_size){
-            if(actual_size - this.desired_size <= this.parent_peer.getAvailableSpace()){
+        }else if (this.desired_size < current_max_size){
+            if(current_max_size - current_free_space <= this.desired_size){
                 this.parent_peer.setMaxSpace(this.desired_size);
                 this.parent_peer.getPeerSystemManager().setAvailableSpace();
             }else{
-                removeNewestFiles();
+                this.removeNewestFiles();
             }
         }
 
@@ -51,6 +52,8 @@ public class Reclaim implements Runnable {
     }
 
     private void removeNewestFiles(){
+
+        
         String peer_directory_backup = this.parent_peer.getPeerSystemManager().getPath() + "/backup"; 
         File backup_dir = new File(peer_directory_backup); 
         File[] dirs = backup_dir.listFiles();
@@ -66,44 +69,49 @@ public class Reclaim implements Runnable {
                 file_times.add(file_info);
             } 
         }
-        
-        removeUntilSpaceFree(file_times);
+
+        this.removeUntilSpaceFree(file_times);
 
     }
 
     //find the newest chunk and remove it, repeat until the desired space is freed
     private void removeUntilSpaceFree(ArrayList<ArrayList<String>> file_times){
+
+        
         ArrayList<String> newest = new ArrayList<String>();
         ArrayList<ArrayList<String>> temp = file_times;
 
-        for(ArrayList<String> arr : temp){
+        for(int i = 0; i < temp.size(); i++){
+            ArrayList<String> arr = temp.get(i);
+            
             if(newest.size() == 0){
-                newest = arr;
-            }else if(Integer.parseInt(newest.get(0)) < Integer.parseInt(arr.get(0))){
-                newest = arr;
+                newest = new ArrayList<String>(arr);
+            }else if(Long.parseLong(newest.get(0)) <= Long.parseLong(arr.get(0))){
+                newest = new ArrayList<String>(arr);
             }
+
         }
 
-        this.parent_peer.getPeerSystemManager().removeChunkFromSystem(newest.get(1), newest.get(2));
+        this.parent_peer.getPeerSystemManager().removeChunkFromPeer(newest.get(1), newest.get(2));
         temp.remove(newest);
-        File chunks_folder = new File(this.parent_peer.getPeerSystemManager().getPath() + newest.get(1));
+        File chunks_folder = new File(this.parent_peer.getPeerSystemManager().getPath() + "backup/" + newest.get(1));
+        
+        
         if(chunks_folder.listFiles().length == 0 && newest.get(1) != null){
-            try{
-                this.parent_peer.getPeerSystemManager().removeDirFromSystem(newest.get(1));  
-            }catch (IOException e) {
-                System.out.println("Error removing file: " + newest.get(1));
-            }
+            this.parent_peer.getPeerSystemManager().removeDirFromPeer(newest.get(1));  
+            
         }
         sendREMOVEDrequest(newest.get(1), Integer.parseInt(newest.get(2)));
 
         this.parent_peer.getPeerSystemManager().setAvailableSpace();
         int actual_size = this.parent_peer.getMaxSpace();
 
-        if(actual_size - this.desired_size <= this.parent_peer.getAvailableSpace()){
+
+        if(actual_size - this.parent_peer.getAvailableSpace() <= this.desired_size){
             this.parent_peer.setMaxSpace(this.desired_size);
             this.parent_peer.getPeerSystemManager().setAvailableSpace();
         }else{
-            removeUntilSpaceFree(temp);
+            this.removeUntilSpaceFree(temp);
         }
 
     }

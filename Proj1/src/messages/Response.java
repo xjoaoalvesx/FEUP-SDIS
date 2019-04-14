@@ -7,7 +7,7 @@ public class Response extends Message{
     
         super(messageType, version, senderId, fileId, chunkNo, "");
 
-        if(messageType != "STORED" && messageType != "CHUNK" && messageType != "REMOVE"){
+        if(messageType != "STORED" && messageType != "CHUNK" && messageType != "REMOVED"){
             System.out.println("Invalid type of response provided (STORED/CHUNK/REMOVE)");
         }
     }

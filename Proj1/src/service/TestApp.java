@@ -121,7 +121,7 @@ public class TestApp implements Runnable {
 
     private void reclaim_start(){
     	try {
-            stub.reclaim();
+            stub.reclaim(Integer.parseInt(this.opnd_1));
         } catch (RemoteException e) {
             System.err.println("Client exception: " + e.toString());
         }

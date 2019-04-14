@@ -5,6 +5,7 @@ import filesystem.PeerSystemManager;
 import subprotocols.Backup;
 import subprotocols.Restore;
 import subprotocols.Delete;
+import subprotocols.Reclaim;
 import messages.Message;
 import messages.MessageHandler;
 
@@ -121,8 +122,8 @@ public class Peer implements RemoteService{
     }
 
     @Override
-    public void reclaim() {
-        System.out.println("RECLAIM");
+    public void reclaim(int size) {
+        scheduler.execute(new Reclaim(this, size));
     }
 
     @Override

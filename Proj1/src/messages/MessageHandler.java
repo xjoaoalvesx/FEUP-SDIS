@@ -69,7 +69,7 @@ public class MessageHandler implements Runnable {
         System.out.println("received msg");
         System.out.println(message.getMessageInBytes().length);
 
-    	String chunk_path = "src/filesystem/Peer" + this.parent_peer.getId() + "/backup/" + fileId;
+    	String chunk_path = "peers/Peer" + this.parent_peer.getId() + "/backup/" + fileId;
 
     	createDirectories(chunk_path);
 

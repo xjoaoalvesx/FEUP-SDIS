@@ -57,7 +57,7 @@ public class Restore implements Runnable {
         ConcurrentMap<Integer, Chunk> chunks = parent_peer.getPeerSystemManager().getChunksRestored(this.fileId);
 
         try {
-            String chunks_path = "src/filesystem/Peer" + parent_peer.getId() + "/restored";
+            String chunks_path = "peers/Peer" + parent_peer.getId() + "/restored";
             Path path = Paths.get(file_path);
             String name = path.getFileName().toString();
             parent_peer.getPeerSystemManager().saveFile(name, chunks_path, joinChunks(new ArrayList<>(chunks.values())));

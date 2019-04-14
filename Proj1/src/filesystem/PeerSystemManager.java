@@ -37,7 +37,7 @@ public class PeerSystemManager{
 
     public PeerSystemManager(Peer parent_peer) {
         this.parent_peer = parent_peer;
-        this.path = "src/filesystem/Peer" + parent_peer.getId() + "/";
+        this.path = "peers/Peer" + parent_peer.getId() + "/";
 
         setupFileSystem();
         chunks_replication_map = new ConcurrentHashMap<>();
@@ -329,5 +329,30 @@ public class PeerSystemManager{
 
     public String getPath(){
         return this.path;
+    }
+
+    public void removeChunkFromPeer(String fileId, String chunkNo){
+    
+        try {
+            String path_of_chunk = this.path + "backup/" + fileId + "/" + chunkNo;
+            File chun = new File(path_of_chunk);
+            chun.delete();
+        } catch (Exception e) {
+            System.out.println("Error deleting chunk");
+        }
+
+    }
+
+    public void removeDirFromPeer(String fileId) {
+       
+
+        try {
+            String path_of_dir = this.path + "backup/" + fileId;
+            File dir = new File(path_of_dir);
+            dir.delete();
+        } catch (Exception e) {
+            System.out.println("Error deleting directory");
+        }
+
     }
 }
