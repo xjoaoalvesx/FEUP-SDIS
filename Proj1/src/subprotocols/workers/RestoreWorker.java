@@ -17,18 +17,15 @@ public class RestoreWorker implements Runnable{
 	private Message message;
     private Random random;
     private Future scheduledHandler;
-    private String received_fileId;
-    private String received_chunkNo;
 
 
-	public RestoreWorker(Peer parent_peer, Message m, String received_fileId, String received_chunkNo){
+	public RestoreWorker(Peer parent_peer, Message m){
 		this.parent_peer = parent_peer;
 		this.version = m.getVersion();
 		this.message = m;
         this.random = new Random();
         this.scheduledHandler = null;
-        this.received_fileId = received_fileId;
-        this.received_chunkNo = received_chunkNo;
+
 	}
 
 	@Override
@@ -38,12 +35,7 @@ public class RestoreWorker implements Runnable{
             System.out.println("Ignoring CHUNKs from own files");
             return;
         }
-
-        if(message.getFileId().equals(this.received_fileId) && message.getChunkNo().equals(this.received_chunkNo)){
-            System.out.print("Another peer already answered");
-            return;
-        }
-
+        
         String fileId = message.getFileId();
         String chunkNo = message.getChunkNo();
 
@@ -54,6 +46,7 @@ public class RestoreWorker implements Runnable{
             return;
         }
         Message chunk_m = create_chunk_message(data);
+
 
         try {
            parent_peer.sendMessageMDR(chunk_m);

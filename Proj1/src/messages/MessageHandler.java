@@ -28,8 +28,6 @@ public class MessageHandler implements Runnable {
     private Future scheduledHandler = null;
     private Random random;
     private static final String ENHANCEMENT = "2.0";
-    private String respond_fileId = null;
-    private String respond_chunkNo = null;
 
 	public MessageHandler(Peer parent_peer, Message msg){
 		this.parent_peer = parent_peer;
@@ -136,10 +134,8 @@ public class MessageHandler implements Runnable {
 
     private void handle_getchunk(){
         Executors.newSingleThreadScheduledExecutor().schedule(() -> {
-            Thread worker = new Thread(new RestoreWorker(parent_peer, message, this.respond_fileId, this.respond_chunkNo));
+            Thread worker = new Thread(new RestoreWorker(parent_peer, message));
             worker.start();
-            this.respond_chunkNo = null;
-            this.respond_fileId = null;
         },  random.nextInt(400), TimeUnit.MILLISECONDS);
         
     }
@@ -147,8 +143,6 @@ public class MessageHandler implements Runnable {
     private void handle_chunk(){
 
         if(!parent_peer.getPeerSystemManager().getRestoringState(message.getFileId())){
-            this.respond_fileId = message.getFileId();
-            this.respond_chunkNo = message.getChunkNo();
             return;
         }
 
