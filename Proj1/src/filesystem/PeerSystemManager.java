@@ -16,6 +16,7 @@ import java.security.*;
 import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.Map;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -412,13 +413,23 @@ public class PeerSystemManager{
     }
 
     public void publishInformation(){
-        System.out.println("Files provided to be backed up:");
-        int i = 1;
-        for(String s : chunks_replication_map.keySet()){
-            if(chunks_replication_map.get(s) != null){
-                System.out.println("     File " + String.valueOf(i) + "(replication degree = " + String.valueOf(this.getDesiredDegree(s+"0")) + "):");            
+
+        String allInfo = "";
+
+        allInfo += "\nBackup Files:\n";
+
+        for(Map.Entry<String, ConcurrentMap<Integer, Chunk>> file : backup_chunks.entrySet()){
+            allInfo += "\nFile: " + file.getKey() ;
+            for(Map.Entry<Integer, Chunk> chunkMap : file.getValue().entrySet()){
+                
+                Chunk chunk = chunkMap.getValue();
+                String temp = file.getKey() + Integer.toString(chunk.getID());
+                allInfo += "\n chunkId: " + Integer.toString(chunk.getID()) +
+                           "\n chunkSize: " + chunk.getSize()/1000 +
+                           "\n perceived replication degree : " + getCurrentDegree(temp);
             }
-            i++;
         }
+
+        System.out.println(allInfo);
     }
 }

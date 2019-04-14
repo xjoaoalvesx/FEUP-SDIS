@@ -6,6 +6,7 @@ import subprotocols.Backup;
 import subprotocols.Restore;
 import subprotocols.Delete;
 import subprotocols.Reclaim;
+import subprotocols.State;
 import messages.Message;
 import messages.MessageHandler;
 
@@ -128,7 +129,7 @@ public class Peer implements RemoteService{
 
     @Override
     public void state() {
-        System.out.println("STATE");
+       scheduler.execute(new State(this));
     }
 	
 	public int getId(){
