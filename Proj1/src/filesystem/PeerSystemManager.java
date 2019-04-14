@@ -308,8 +308,8 @@ public class PeerSystemManager{
 
     }
  
-
-    public int getAvailableSpace(){ 
+    //returns free space
+    public int setAvailableSpace(){ 
         int used_space = 0; 
         String peer_directory_backup = this.path + "/backup"; 
         File backup_dir = new File(peer_directory_backup); 
@@ -325,5 +325,9 @@ public class PeerSystemManager{
         this.parent_peer.setAvailableSpace(this.parent_peer.getMaxSpace() - used_space); 
  
         return this.parent_peer.getAvailableSpace(); 
-    } 
+    }
+
+    public String getPath(){
+        return this.path;
+    }
 }
