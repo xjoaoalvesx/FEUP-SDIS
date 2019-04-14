@@ -64,7 +64,7 @@ public class PeerSystemManager{
     }
 
     public boolean saveFile(String name, String path, byte[] data) throws IOException {
-        if(data.length < this.parent_peer.getAvailableSpace()){
+        if(data.length > this.parent_peer.getAvailableSpace()){
             return false;
         }
 
