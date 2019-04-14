@@ -26,6 +26,7 @@ public class MessageHandler implements Runnable {
     private int handler_index;
     private Future scheduledHandler = null;
     private Random random;
+    private static final String ENHANCEMENT = "2.0";
 
 	public MessageHandler(Peer parent_peer, Message msg){
 		this.parent_peer = parent_peer;
@@ -77,47 +78,44 @@ public class MessageHandler implements Runnable {
 
     	String chunk_path = "peers/Peer" + this.parent_peer.getId() + "/backup/" + fileId;
 
-    	
-        // normal
-    	//saveChunk(fileId, chunkNo, replicationDeg, chunk, chunk_path);
-
         Message stored = createSTORED(message.getVersion(), Integer.toString(parent_peer.getId()), fileId, chunkNo);
-
-        //Executors.newSingleThreadScheduledExecutor().schedule(() -> {
-        //    try {
-        //        parent_peer.sendMessageMC(stored);
-        //    } catch (IOException e) {
-        //        System.out.println("Error: Could not send message(STORED) to MC channel!");
-        //    }
-        //},  random.nextInt(400), TimeUnit.MILLISECONDS);
-        //normal
-        
-        //enhancement
-        
-        Executors.newSingleThreadScheduledExecutor().schedule(() -> {
-            if (parent_peer.getPeerSystemManager().getDegree(fileId, chunkNo) < replicationDeg){
-                createDirectories(chunk_path);
-                boolean chunk_save = saveChunk(fileId, chunkNo, replicationDeg, chunk, chunk_path);
-                    if(chunk_save){
-                        try {
-                            System.out.println("sending stored");
-                            parent_peer.sendMessageMC(stored);
-                        } catch (IOException e) {
-                        System.out.println("Error: Could not send message(STORED) to MC channel!");
+        System.out.println(message.getVersion());
+        if(message.getVersion().equals(ENHANCEMENT)){
+            System.out.println("ENHANCEMENT");
+            Executors.newSingleThreadScheduledExecutor().schedule(() -> {
+                if (parent_peer.getPeerSystemManager().getDegree(fileId, chunkNo) < replicationDeg){
+                    createDirectories(chunk_path);
+                    boolean chunk_save = saveChunk(fileId, chunkNo, replicationDeg, chunk, chunk_path);
+                        if(chunk_save){
+                            try {
+                                System.out.println("sending stored");
+                                parent_peer.sendMessageMC(stored);
+                            } catch (IOException e) {
+                            System.out.println("Error: Could not send message(STORED) to MC channel!");
+                            }
                         }
-                    }
+                }
+            }, random.nextInt(400), TimeUnit.MILLISECONDS);
+        }
+
+        else {
+            createDirectories(chunk_path);
+        // normal
+            boolean s = saveChunk(fileId, chunkNo, replicationDeg, chunk, chunk_path);
+
+            Executors.newSingleThreadScheduledExecutor().schedule(() -> {
+            try {
+               parent_peer.sendMessageMC(stored);
+            } catch (IOException e) {
+               System.out.println("Error: Could not send message(STORED) to MC channel!");
             }
-        }, random.nextInt(400), TimeUnit.MILLISECONDS);
-            
-
-
-
-        //enhancement
+            },  random.nextInt(400), TimeUnit.MILLISECONDS);
+        //normal
+        }
 
     }
 
     private void handle_stored(){
-        System.out.println(message.getSenderId() + " senderid");
         parent_peer.getPeerSystemManager().incDegree(message.getFileId(), message.getChunkNo(), message.getSenderId());
     }
 
