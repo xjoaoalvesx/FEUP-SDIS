@@ -18,6 +18,7 @@ import java.util.concurrent.ConcurrentMap;
 public class State implements Runnable {
 
 	private Peer parent_peer;
+	private String version;
 
 	public State(Peer parent_peer){
 		this.parent_peer = parent_peer;
@@ -26,7 +27,10 @@ public class State implements Runnable {
 	@Override
 	public void run(){
 		this.parent_peer.getPeerSystemManager().publishInformation();
+
+		System.out.println("State run");
 	}
+
 
 
 }
