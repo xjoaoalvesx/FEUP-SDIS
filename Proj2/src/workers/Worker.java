@@ -1,5 +1,7 @@
 package workers;
 
-public abstract class Worker implements Runnable{
+public abstract class Worker extends  Thread{
+		
+
 	
 }
