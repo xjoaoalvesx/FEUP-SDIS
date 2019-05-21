@@ -1,7 +1,7 @@
 package network;
 
-public class Peer extends Node {
+public class Peer implements PeerNode {
 
-	
+
 
 }
