@@ -12,5 +12,38 @@ public final class Key implements Serializable {
 
 	public final long key_value;
 
-	public Key(final long key)
+	public Key(final long key){
+
+		if(key < MIN){
+			throw new IllegalArgumentException("Key must be higher than" + MIN);
+		}
+
+		this.key_value = key % MAX
+	}
+
+	/*
+	 *	Checks if key is in interval ]lower_bound, upper_bound]
+	 * 
+	 */
+	public boolean IsKeyBetween(final Key lower_bound, final Key upper_bound){
+		
+		final long lower = lower_bound.key_value;
+		final long upper = upper_bound.key_value;
+
+		if(lower < upper){
+			return this.key_value > lower && this.key_value < upper;
+		}
+		else{
+			return this.key_value > lower || this.key_value <= upper;
+		}
+	}
+
+	@Override
+	public boolean equals(final Object o){
+		if(! (o instanceof 	Key)){
+			return false;
+		}
+
+		return this == object || this.key_value == ((Key) o).key_value;
+	}
 }
