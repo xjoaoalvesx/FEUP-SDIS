@@ -1,5 +1,8 @@
 package network;
 
+import java.io.*;
+
+
 public final class Key implements Serializable {
 	
 	// private static final long serialVersionUID = 
@@ -18,7 +21,7 @@ public final class Key implements Serializable {
 			throw new IllegalArgumentException("Key must be higher than" + MIN);
 		}
 
-		this.key_value = key % MAX
+		this.key_value = key % MAX;
 	}
 
 	/*
@@ -65,6 +68,6 @@ public final class Key implements Serializable {
 			return false;
 		}
 
-		return this == object || this.key_value == ((Key) o).key_value;
+		return this == o || this.key_value == ((Key) o).key_value;
 	}
 }
