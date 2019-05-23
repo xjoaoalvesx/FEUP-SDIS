@@ -8,9 +8,9 @@ public interface PeerNode extends Remote {
 	
 	Key getNodeKey();
 
-	PeerNode successor();
+	PeerNode findSuccessor();
 	
-	PeerNode predecessor();
+	PeerNode findPredecessor();
 
 	Future lookup(Key key);
 

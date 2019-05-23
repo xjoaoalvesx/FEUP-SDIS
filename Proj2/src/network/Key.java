@@ -38,6 +38,27 @@ public final class Key implements Serializable {
 		}
 	}
 
+	public static Key generateFromAddress(InetSocketAddress isa){
+		if (isa == null){
+			return null;
+		}
+		else{
+			return new Key();
+		}
+	}
+
+	public static int hash(InetSocketAddress isa){
+		String ip_add = isa.getAddress().getHostAddress();
+		int port = isa.getPort();
+
+		String toHash = ip_add + Integer.toString(port);
+
+		
+
+	}
+
+
+
 	@Override
 	public boolean equals(final Object o){
 		if(! (o instanceof 	Key)){
