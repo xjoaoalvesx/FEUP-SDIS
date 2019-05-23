@@ -1,30 +1,36 @@
 package service;
 
 import network.Peer;
+import network.Server;
 
-import java.io.IOException;
-import java.rmi.RemoteException;
-import java.rmi.registry.Registry;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.server.UnicastRemoteObject;
-
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.io.*;
+import java.net.*;
 
 
 public class StartPeer {
 
 	public static void main(String[] args){
 
-		if(args.length != 2){
-			System.out.println("Usage:\njava -classpath bin service.StartPeer <peer_id> <port>");
+		if(args.length != 1 && args.length != 2){
+			System.out.println("Usage:");
+			System.out.println("\tjava -classpath bin service.StartPeer <port>");
+			System.out.println("\tor");
+			System.out.println("\tjava -classpath bin service.StartPeer <port> <peer_id>");
 			return;
 		}
 
-		int peer_id = Integer.parseInt(args[0]);
-		int port = Integer.parseInt(args[1]);
-		Peer peer = new Peer(peer_id, port);
-		
-		System.out.println("Peer " + args[0] + " has been created on the " + args[1] + " port.");
+		int port = Integer.parseInt(args[0]);
+
+		if(args.length == 1){
+
+			Server server = new Server(port);
+			System.out.println("Server has been created on the " + port + " port.");
+		}
+		else{
+
+			int peerID = Integer.parseInt(args[1]);
+			Peer peer = new Peer(peerID, port);
+			System.out.println("Peer " + peerID + " has been created on the " + port + " port.");
+		}
 	}
 }
