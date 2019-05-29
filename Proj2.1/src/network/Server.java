@@ -11,6 +11,7 @@ import javax.net.ssl.SSLServerSocketFactory;
 
 public class Server {
 
+	private InetSocketAddress server_address;
 	private int port;
 	private String ip;
 	//private ServerSocket serverSocket;
@@ -19,10 +20,12 @@ public class Server {
 	// private ConcurrentMap<String, String> files; 								// fileID -> chunkID
 	// private ConcurrentHashMap<String, Integer> chunks; 							// chunkID -> ID
 
-	public Server(int port){
+	public Server(InetSocketAddress address){
 
-		this.port = port;
-		this.ip = getServerIP();
+		this.server_address = address;
+		this.port = server_address.getPort();
+		this.ip = server_address.getAddress().getHostAddress();
+		
 		System.out.println("Server IP: " + ip);
 
 		this.peers = new ConcurrentHashMap<>();

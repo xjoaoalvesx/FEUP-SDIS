@@ -13,20 +13,27 @@ public class StartPeer {
 
 	public static void main(String[] args){
 
-		if(args.length != 1 && args.length != 4){
+		if(args.length != 2 && args.length != 4){
+			
 			System.out.println("Usage:");
-			System.out.println("\tjava -classpath bin service.StartPeer <server_port>");
+			System.out.println("\tjava -classpath bin service.StartPeer <server_ip> <server_port>");
 			System.out.println("\tor");
 			System.out.println("\tjava -classpath bin service.StartPeer <peer_port> <peer_id> <server_ip> <server_port>");
 			return;
 		}
 
-		int port = Integer.parseInt(args[0]);
-
-		if(args.length == 1){
-
-			System.out.println("Server has been created on the " + port + " port.");
-			Server server = new Server(port);
+		int port = Integer.parseInt(args[1]);
+		String ip = args[0];
+		 
+		if(args.length == 2){
+			InetAddress inetAd;
+			try{
+				inetAd = InetAddress.getByName(ip);
+				System.out.println("Server has been created on the " + port + " port.");
+				Server server = new Server(new InetSocketAddress(inetAd, port));
+			}catch(UnknownHostException e){
+				e.printStackTrace();
+			}
 		}
 		else{
 
