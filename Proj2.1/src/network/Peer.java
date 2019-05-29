@@ -3,6 +3,9 @@ package network;
 import java.io.*;
 import java.net.*;
 import java.util.concurrent.ConcurrentHashMap;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
+import java.util.Scanner;
 
 public class Peer {
 
@@ -20,21 +23,35 @@ public class Peer {
 		this.serverIP = serverIP;
 		this.serverPort = serverPort;
 
+		System.setProperty("javax.net.ssl.trustStore", "src/network/myTrustStore.jts");
+		System.setProperty("javax.net.ssl.trustStorePassword", "123456");
+		//System.setProperty("javax.net.debug", "all");
+
 		try{
 
-			Socket socket = new Socket(serverIP, serverPort);
+			Scanner scn = new Scanner(System.in);
 
-			String message = registerPeerMessage();
+			SSLSocketFactory sslsocketfactory = (SSLSocketFactory)SSLSocketFactory.getDefault();
+			SSLSocket sslSocket = (SSLSocket)sslsocketfactory.createSocket(this.serverIP,this.serverPort);
+			DataOutputStream outputStream = new DataOutputStream(sslSocket.getOutputStream());
+			DataInputStream inputStream = new DataInputStream(sslSocket.getInputStream());
 
-			DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
-			// BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-
-			dos.writeBytes(message);
-
-			socket.close();
+			//sslSocket.startHandshake();
 			while(true){
+				System.out.println(inputStream.readUTF());
+				String tosend = scn.nextLine();
+				outputStream.writeUTF(tosend);
+
+				if(tosend.equals("Exit")){
+					System.out.println("Closing this connection : " + sslSocket);
+					sslSocket.close();
+					break;
+				}
 
 			}
+			scn.close();
+			inputStream.close();
+			outputStream.close();
 		}
 		catch(IOException ioException){
 
