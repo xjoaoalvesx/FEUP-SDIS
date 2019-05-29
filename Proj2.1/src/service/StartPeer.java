@@ -37,9 +37,9 @@ public class StartPeer {
 		}
 		else{
 
-			int peerID = Integer.parseInt(args[1]);
-			String serverIP = args[2];
-			int serverPort = Integer.parseInt(args[3]);
+			int peerID = Integer.parseInt(args[2]);
+			String serverIP = args[3];
+			int serverPort = Integer.parseInt(args[4]);
 
 			try {
 				Peer peer = new Peer(peerID, ip, port, serverIP, serverPort);
