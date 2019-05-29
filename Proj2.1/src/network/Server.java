@@ -106,7 +106,6 @@ public class Server {
 		int peerPort = Integer.parseInt(msgData[2]);
 		String peerIP = msgData[3];
 
-
 		ConcurrentHashMap<Integer, String> chm = new ConcurrentHashMap<Integer, String>(); 
 		chm.put(peerPort, peerIP);
 		peers.put(peerID, chm);
