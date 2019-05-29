@@ -1,6 +1,8 @@
 package service;
 
+import java.rmi.*;
 import java.rmi.registry.*;
+import java.util.*;
 
 public class Client implements Runnable{
 
@@ -62,7 +64,7 @@ public class Client implements Runnable{
 	@Override
 	public void run() {
     	initStub();
-    	protocol_handlers.get(subProtocolIndex).run();
+    	protocolHandlers.get(subProtocolIndex).run();
     }
 
     private void initStub(){
