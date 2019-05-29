@@ -1,10 +1,12 @@
 package network;
 
+import service.RemoteService;
+
 import java.io.*;
 import java.net.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class Peer {
+public class Peer implements RemoteService{
 
 	private int peerID;
 	private String peerIP;
@@ -42,6 +44,28 @@ public class Peer {
 		}
 	}
 
+
+
+	@Override
+	public void backup(String path){
+
+		System.out.println("backup");
+	}
+
+	@Override
+	public void delete(String path){
+
+		System.out.println("delete");
+	}
+
+	@Override
+	public void restore(String path){
+
+		System.out.println("restore");
+	}
+
+
+
 	// REGISTER peerID peerPort peerIP
 	private String registerPeerMessage(){
 
@@ -49,7 +73,7 @@ public class Peer {
 		str += " ";
 		str += String.valueOf(peerID);
 		str += " ";
-		str += String.valueOf(peerPort);;
+		str += String.valueOf(peerPort);
 		str += " ";
 		str += peerIP;
 		return str;
