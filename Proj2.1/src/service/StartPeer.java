@@ -13,18 +13,18 @@ public class StartPeer {
 
 	public static void main(String[] args){
 
-		if(args.length != 2 && args.length != 4){
-			
+		if(args.length != 2 && args.length != 5){
+
 			System.out.println("Usage:");
 			System.out.println("\tjava -classpath bin service.StartPeer <server_ip> <server_port>");
 			System.out.println("\tor");
-			System.out.println("\tjava -classpath bin service.StartPeer <peer_port> <peer_id> <server_ip> <server_port>");
+			System.out.println("\tjava -classpath bin service.StartPeer <peer_ip> <peer_port> <peer_id> <server_ip> <server_port>");
 			return;
 		}
 
-		int port = Integer.parseInt(args[1]);
 		String ip = args[0];
-		 
+		int port = Integer.parseInt(args[1]);
+
 		if(args.length == 2){
 			InetAddress inetAd;
 			try{
@@ -42,7 +42,7 @@ public class StartPeer {
 			int serverPort = Integer.parseInt(args[3]);
 
 			try {
-				Peer peer = new Peer(peerID, port, serverIP, serverPort);
+				Peer peer = new Peer(peerID, ip, port, serverIP, serverPort);
 				RemoteService stub = (RemoteService) UnicastRemoteObject.exportObject(peer, 0);
 
 				Registry registry = LocateRegistry.getRegistry();

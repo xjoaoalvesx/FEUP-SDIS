@@ -17,10 +17,10 @@ public class Peer implements RemoteService{
 	private String serverIP;
 	private int serverPort;
 
-	public Peer(int peerID, int peerPort, String serverIP, int serverPort){
+	public Peer(int peerID, String peerIP, int peerPort, String serverIP, int serverPort){
 
 		this.peerID = peerID;
-		this.peerIP = getPeerIP();
+		this.peerIP = peerIP;
 		this.peerPort = peerPort;
 		this.serverIP = serverIP;
 		this.serverPort = serverPort;
@@ -94,20 +94,5 @@ public class Peer implements RemoteService{
 		str += " ";
 		str += peerIP;
 		return str;
-	}
-
-	private static String getPeerIP(){
-
-		String ip = "";
-		try{
-
-			ip = InetAddress.getLocalHost().getHostAddress();
-		}
-		catch(UnknownHostException unknownHostException){
-
-			unknownHostException.printStackTrace();
-		}
-
-		return ip;
 	}
 }
