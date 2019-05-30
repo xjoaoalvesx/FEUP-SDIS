@@ -1,8 +1,20 @@
 package network;
 
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
+
+import java.io.Serializable;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+
 public class Message implements Serializable{
 	
-	static final long.serialVersionUID = 214321L;
+	static final long serialVersionUID = 214321L;
 
 
 	public enum Type {
@@ -23,21 +35,22 @@ public class Message implements Serializable{
 
 	private InetSocketAddress sender;
 
-	private Message(Type task){
-		this.messageTask;
+	private Message(Type t){
+		this.type = t;
 	}
 
-	public static request(Type t, InetSocketAddress senderAddress){
+	public static Message request(Type t, InetSocketAddress senderAddress){
 		Message message = new Message(t);
 		message.sender = senderAddress;
 		message.isOfTypeRequest = true;
 
+		return message;
 	}
 
-	public static response(Type t, int id){
+	public static Message response(Type t, int id){
 		Message message = new Message(t);
 		message.identifier = id;
-		message.isOfTypeRequest;
+		message.isOfTypeRequest = false;
 		return message;
 	}
 

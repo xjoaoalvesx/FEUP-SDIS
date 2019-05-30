@@ -25,7 +25,7 @@ public class Server {
 		this.server_address = address;
 		this.port = server_address.getPort();
 		this.ip = server_address.getAddress().getHostAddress();
-		
+
 		System.out.println("Server IP: " + ip);
 
 		this.peers = new ConcurrentHashMap<>();
@@ -73,47 +73,7 @@ public class Server {
 		
 	}
 
-	private static String getServerIP(){
-
-		String ip = "";
-		try{
-
-			ip = InetAddress.getLocalHost().getHostAddress();
-		}
-		catch(UnknownHostException unknownHostException){
-
-			unknownHostException.printStackTrace();
-		}
-
-		return ip;
-	}
-
-	private void manageMessage(String msg){
-
-		String[] msgData = msg.split(" ");
-		switch(msgData[0]){
-
-			case "REGISTER":
-				manageREGISTER(msgData);
-				break;
-
-			default:
-				break;
-		}
-	}
-
-	// REGISTER peerID peerPort peerIP
-	private void manageREGISTER(String[] msgData){
-
-		int peerID = Integer.parseInt(msgData[1]);
-		int peerPort = Integer.parseInt(msgData[2]);
-		String peerIP = msgData[3];
-
-		ConcurrentHashMap<Integer, String> chm = new ConcurrentHashMap<Integer, String>(); 
-		chm.put(peerPort, peerIP);
-		peers.put(peerID, chm);
-		System.out.println(peers);
-	}
+	
 }
 
 class PeerHandler extends Thread{

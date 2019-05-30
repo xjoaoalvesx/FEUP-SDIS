@@ -1,13 +1,23 @@
 package network;
 
 import service.RemoteService;
+import network.workers.MessageHandler;
 
-import java.io.*;
-import java.net.*;
+
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.Scanner;
+
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
-import java.util.Scanner;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 
 public class Peer implements RemoteService{
 
@@ -17,6 +27,8 @@ public class Peer implements RemoteService{
 	private String serverIP;
 	private int serverPort;
 
+	private MessageHandler messageHandler;
+
 	public Peer(int peerID, String peerIP, int peerPort, String serverIP, int serverPort){
 
 		this.peerID = peerID;
@@ -24,6 +36,8 @@ public class Peer implements RemoteService{
 		this.peerPort = peerPort;
 		this.serverIP = serverIP;
 		this.serverPort = serverPort;
+
+		this.messageHandler = new MessageHandler(this);
 
 		System.setProperty("javax.net.ssl.trustStore", "src/network/myTrustStore.jts");
 		System.setProperty("javax.net.ssl.trustStorePassword", "123456");
