@@ -25,15 +25,17 @@ public class StartPeer {
 		String ip = args[0];
 		int port = Integer.parseInt(args[1]);
 
+		InetAddress inetAd = null;
+		try{
+			inetAd = InetAddress.getByName(ip);
+		}catch(UnknownHostException e){
+			e.printStackTrace();
+		}
+
 		if(args.length == 2){
-			InetAddress inetAd;
-			try{
-				inetAd = InetAddress.getByName(ip);
 				System.out.println("Server has been created on the " + port + " port.");
 				Server server = new Server(new InetSocketAddress(inetAd, port));
-			}catch(UnknownHostException e){
-				e.printStackTrace();
-			}
+			
 		}
 		else{
 
@@ -42,7 +44,7 @@ public class StartPeer {
 			int serverPort = Integer.parseInt(args[4]);
 
 			try {
-				Peer peer = new Peer(peerID, ip, port, serverIP, serverPort);
+				Peer peer = new Peer(peerID, new InetSocketAddress(inetAd, port), serverIP, serverPort);
 				RemoteService stub = (RemoteService) UnicastRemoteObject.exportObject(peer, 0);
 
 				Registry registry = LocateRegistry.getRegistry();

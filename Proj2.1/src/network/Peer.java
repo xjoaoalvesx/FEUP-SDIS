@@ -22,18 +22,18 @@ import java.io.DataOutputStream;
 public class Peer implements RemoteService{
 
 	private int peerID;
-	private String peerIP;
-	private int peerPort;
+
 	private String serverIP;
 	private int serverPort;
 
+	private final InetSocketAddress peerAddress;
+
 	private MessageHandler messageHandler;
 
-	public Peer(int peerID, String peerIP, int peerPort, String serverIP, int serverPort){
+	public Peer(int peerID, InetSocketAddress address, String serverIP, int serverPort){
 
 		this.peerID = peerID;
-		this.peerIP = peerIP;
-		this.peerPort = peerPort;
+		this.peerAddress = address;
 		this.serverIP = serverIP;
 		this.serverPort = serverPort;
 
@@ -77,6 +77,18 @@ public class Peer implements RemoteService{
 
 
 
+
+
+	// public boolean registerToServer(InetSocketAddress server){
+
+	// 	System.out.println("Joining Server at " + server);
+
+	// 	if(server == null || server.equals())
+
+
+	// }
+
+
 	@Override
 	public void backup(String path){
 
@@ -95,18 +107,4 @@ public class Peer implements RemoteService{
 		System.out.println("restore");
 	}
 
-
-
-	// REGISTER peerID peerPort peerIP
-	private String registerPeerMessage(){
-
-		String str = "REGISTER";
-		str += " ";
-		str += String.valueOf(peerID);
-		str += " ";
-		str += String.valueOf(peerPort);
-		str += " ";
-		str += peerIP;
-		return str;
-	}
 }
