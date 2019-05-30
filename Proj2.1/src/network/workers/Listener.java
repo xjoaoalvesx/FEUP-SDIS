@@ -20,8 +20,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 
 public class Listener extends Thread {
-	
-	
+
+
 	private Node node;
 	private MessageHandler messageHandler;
 	private SSLServerSocket sslsocket;
@@ -57,7 +57,7 @@ public class Listener extends Thread {
 
 	}
 
-	
+
 	@Override
 	public void run(){
 
@@ -107,11 +107,12 @@ public class Listener extends Thread {
 			e.printStackTrace();
 		}
 
-		Serializable response = null;
+		Message response = null;
 
 		if(message.isRequest()){
 			response = messageHandler.manageRequest(message);
 		}else{
+			System.out.println("ITS TYPE RESP");
 			messageHandler.manageResponse(message);
 		}
 

@@ -44,8 +44,10 @@ public class Peer implements Node, RemoteService{
 		this.messageHandler = new MessageHandler(this);
 		this.listener = new Listener(this, messageHandler);
 
-		startWorkers();
+		System.out.println("Peer " + peerID + " has been created on the " + peerAddress.getPort() + " port.");
 
+
+		startWorkers();
 		registerToServer(serverAddress);
 	}
 
@@ -64,6 +66,10 @@ public class Peer implements Node, RemoteService{
 		Message request = Message.request(Message.Type.REGISTER, peerAddress);
 
 		Message response = messageHandler.dispatchRequest(server, request);
+
+		if(response.getMessageType() == Message.Type.ACCEPTED){
+			System.out.println("Peer is now assigned to server : " + server + "\n");
+		}
 	}
 
 	@Override

@@ -19,7 +19,7 @@ import java.util.concurrent.Executors;
 
 
 public class MessageHandler extends Thread{
-	
+
 	private Node node;
 	private ExecutorService executor;
 
@@ -74,18 +74,21 @@ public class MessageHandler extends Thread{
 
 	public void manageResponse(Message message){
 
+
 	}
 
 
 	public Message manageRequest(Message message){
 
-		System.out.println("Received " + message.getMessageType() + " Message.");
+		System.out.println("Received Request " + message.getMessageType() + " Message.");
 
 		Message response = null;
 
 		switch(message.getMessageType()){
 			case REGISTER:
 				response = manageRegisterRequest(message);
+				break;
+
 		}
 
 		return response;
@@ -93,13 +96,13 @@ public class MessageHandler extends Thread{
 
 
 	private Message manageRegisterRequest(Message request){
-		System.out.println("Save peer in server data");
+		System.out.println("New Peer Assigned!\n");
 
 		return Message.response(Message.Type.ACCEPTED, request.getIdentifier());
 	}
 
 	// socket send and socket receive functions
-	
+
 	public SSLSocket makeConnection(InetAddress address_ip, int port) throws IOException{
 		SSLSocketFactory factory = (SSLSocketFactory)SSLSocketFactory.getDefault();
 		SSLSocket ssocket;
@@ -110,19 +113,15 @@ public class MessageHandler extends Thread{
 		ssocket.setEnabledCipherSuites(ssocket.getSupportedCipherSuites());
 		return ssocket;
 	}
-	
+
 	private SSLSocket sendMessage(InetSocketAddress address, Message message){
 
 
 		SSLSocket ssocket = null;
 		try{
 			ssocket = makeConnection(address.getAddress(), address.getPort());
-			System.out.println("1");
-			System.out.println(ssocket);
 			ObjectOutputStream out_stream = new ObjectOutputStream(ssocket.getOutputStream());
-			System.out.println("2");
 			out_stream.writeObject(message);
-			System.out.println("3");
 		}catch(IOException e){
 			System.err.println(e.getMessage());
 			e.printStackTrace();
