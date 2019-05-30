@@ -43,8 +43,15 @@ public class StartPeer {
 			String serverIP = args[3];
 			int serverPort = Integer.parseInt(args[4]);
 
+			InetAddress server_ad = null;
+			try{
+				server_ad = InetAddress.getByName(serverIP); 
+			}catch(UnknownHostException e){
+				e.printStackTrace();
+			}	
+
 			try {
-				Peer peer = new Peer(peerID, new InetSocketAddress(inetAd, port), serverIP, serverPort);
+				Peer peer = new Peer(peerID, new InetSocketAddress(inetAd, port), new InetSocketAddress(server_ad, serverPort));
 				// RemoteService stub = (RemoteService) UnicastRemoteObject.exportObject(peer, 0);
 
 				// Registry registry = LocateRegistry.getRegistry();

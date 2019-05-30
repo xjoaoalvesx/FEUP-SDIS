@@ -24,45 +24,46 @@ public class Peer implements Node{
 
 	private int peerID;
 
-	private String serverIP;
-	private int serverPort;
 
 	private final InetSocketAddress peerAddress;
+	private InetSocketAddress serverAddress;
 
 	private MessageHandler messageHandler;
 	private Listener listener;
 
-	public Peer(int peerID, InetSocketAddress address, String serverIP, int serverPort){
+	public Peer(int peerID, InetSocketAddress address, InetSocketAddress server_ad){
 
 		this.peerID = peerID;
 		this.peerAddress = address;
-		this.serverIP = serverIP;
-		this.serverPort = serverPort;
+		this.serverAddress = server_ad;
 
 		this.messageHandler = new MessageHandler(this);
 		this.listener = new Listener(this, messageHandler);
 
 		startWorkers();
+
+		registerToServer(serverAddress);
 	}
 
 
 
 
 
-	// public boolean registerToServer(InetSocketAddress server){
+	public void registerToServer(InetSocketAddress server){
 
-	// 	System.out.println("Joining Server at " + server);
+		System.out.println("Joining Server at " + server);
 
-	// 	if(server == null || server.equals(getLocalAddress())){
-	// 		System.out.println("Failed to register to server");
-	// 	}
+		if(server == null || server.equals(getLocalAddress())){
+			System.out.println("Failed to register to server");
+		}
 
-	// 	Message request = Message.request(Message.Type.REGISTER, peerAddress);
+		Message request = Message.request(Message.Type.REGISTER, peerAddress);
+		System.out.println(request);
 
-	// 	messageHandler.
+		Message response = messageHandler.dispatchRequest(server, request);
 
 
-	// }
+	}
 
 	@Override
 	public void startWorkers(){

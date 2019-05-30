@@ -30,6 +30,11 @@ public class MessageHandler extends Thread{
 	}
 
 
+
+
+
+
+
 	public Message dispatchRequest(InetSocketAddress address, Message message){
 
 		if(!message.isRequest()){
@@ -73,9 +78,24 @@ public class MessageHandler extends Thread{
 
 	public Message manageRequest(Message message){
 
-		return null;
+		System.out.println("Received " + message.getMessageType() + " Message.");
+
+		Message response = null;
+
+		switch(message.getMessageType()){
+			case REGISTER:
+				response = manageRegisterRequest(message);
+		}
+
+		return response;
 	}
 
+
+	private Message manageRegisterRequest(Message request){
+		System.out.println("Save peer in server data");
+
+		return Message.response(Message.Type.ACCEPTED, request.getIdentifier());
+	}
 
 	// socket send and socket receive functions
 	
@@ -84,7 +104,6 @@ public class MessageHandler extends Thread{
 		SSLSocket ssocket;
 
 		ssocket = (SSLSocket) factory.createSocket(address_ip, port);
-		
 		return ssocket;
 	}
 	
@@ -94,10 +113,14 @@ public class MessageHandler extends Thread{
 		SSLSocket ssocket = null;
 		try{
 			ssocket = makeConnection(address.getAddress(), address.getPort());
+			System.out.println("1");
 			ObjectOutputStream out_stream = new ObjectOutputStream(ssocket.getOutputStream());
+			System.out.println("2");
 			out_stream.writeObject(message);
+			System.out.println("3");
 		}catch(IOException e){
-			System.out.println("Failed to connect to Server");
+			System.err.println(e.getMessage());
+			e.printStackTrace();
 		}
 
 		return ssocket;
