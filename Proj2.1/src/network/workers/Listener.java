@@ -16,6 +16,7 @@ import java.io.Serializable;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
 public class Listener extends Thread {
@@ -24,7 +25,7 @@ public class Listener extends Thread {
 	private Node node;
 	private MessageHandler messageHandler;
 	private SSLServerSocket sslsocket;
-	private boolean up;
+	private AtomicBoolean up = new AtomicBoolean(true);
 
 	private ExecutorService executor;
 
@@ -34,7 +35,6 @@ public class Listener extends Thread {
 		this.node = node;
 		this.messageHandler = handler;
 		this.sslsocket = startSSocket();
-		this.up = true;
 
 		this.executor = Executors.newFixedThreadPool(5);
 	}
@@ -48,6 +48,7 @@ public class Listener extends Thread {
 
         try{
         	sslServerSocket = (SSLServerSocket) sslServerSocketFactory.createServerSocket(port);
+        	sslServerSocket.setEnabledCipherSuites(sslServerSocket.getSupportedCipherSuites());
         }catch(IOException e){
         	throw new RuntimeException("Could not open port : " + port , e);
         }
@@ -60,7 +61,7 @@ public class Listener extends Thread {
 	@Override
 	public void run(){
 
-		while(this.up){
+		while(this.up.get()){
 			this.work();
 		}
 
@@ -74,6 +75,7 @@ public class Listener extends Thread {
 
 		try{
 			socket = (SSLSocket) sslsocket.accept();
+
 		}catch(IOException e){
 			throw new RuntimeException("Connection failed!", e);
 		}
@@ -139,7 +141,7 @@ public class Listener extends Thread {
 
 
 	public void setDown(){
-		this.up = false;
+		this.up.set(false);
 	}
 
 }

@@ -36,10 +36,10 @@ public class Peer implements Node, RemoteService{
 		this.peerAddress = address;
 		this.serverAddress = server_ad;
 
-		System.setProperty("javax.net.ssl.trustStore", "src/network/truststore");
-		System.setProperty("javax.net.ssl.trustStorePassword", "123456");
 		System.setProperty("javax.net.ssl.keyStore", "src/network/server.keys");
 		System.setProperty("javax.net.ssl.keyStorePassword", "123456");
+		System.setProperty("javax.net.ssl.trustStore", "src/network/truststore");
+		System.setProperty("javax.net.ssl.trustStorePassword", "123456");
 
 		this.messageHandler = new MessageHandler(this);
 		this.listener = new Listener(this, messageHandler);

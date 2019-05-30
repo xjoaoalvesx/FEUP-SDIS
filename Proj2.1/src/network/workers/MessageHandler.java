@@ -27,6 +27,7 @@ public class MessageHandler extends Thread{
 	public MessageHandler(Node peer){
 		this.node = peer;
 		this.executor = Executors.newFixedThreadPool(3);
+
 	}
 
 
@@ -106,6 +107,7 @@ public class MessageHandler extends Thread{
 		InetSocketAddress isa = new InetSocketAddress(address_ip, port);
 		ssocket = (SSLSocket) factory.createSocket();
 		ssocket.connect(isa, 5000);
+		ssocket.setEnabledCipherSuites(ssocket.getSupportedCipherSuites());
 		return ssocket;
 	}
 	
@@ -116,9 +118,10 @@ public class MessageHandler extends Thread{
 		try{
 			ssocket = makeConnection(address.getAddress(), address.getPort());
 			System.out.println("1");
+			System.out.println(ssocket);
 			ObjectOutputStream out_stream = new ObjectOutputStream(ssocket.getOutputStream());
 			System.out.println("2");
-			// out_stream.writeObject(message);
+			out_stream.writeObject(message);
 			System.out.println("3");
 		}catch(IOException e){
 			System.err.println(e.getMessage());
