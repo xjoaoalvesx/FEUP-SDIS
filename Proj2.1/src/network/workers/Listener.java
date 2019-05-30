@@ -70,7 +70,7 @@ public class Listener extends Thread {
 
 	private void work(){
 
-		final SSLSocket socket;
+		SSLSocket socket;
 
 		try{
 			socket = (SSLSocket) sslsocket.accept();

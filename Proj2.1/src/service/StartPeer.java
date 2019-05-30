@@ -52,7 +52,7 @@ public class StartPeer {
 
 			try {
 				Peer peer = new Peer(peerID, new InetSocketAddress(inetAd, port), new InetSocketAddress(server_ad, serverPort));
-				// RemoteService stub = (RemoteService) UnicastRemoteObject.exportObject(peer, 0);
+				RemoteService stub = (RemoteService) UnicastRemoteObject.exportObject(peer, 0);
 
 				Registry registry = LocateRegistry.getRegistry();
 				String name = "P" + String.valueOf(peerID);

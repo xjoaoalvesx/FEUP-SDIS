@@ -40,11 +40,12 @@ public class Server implements Node{
 		// this.files = new ConcurrentHashMap<>();
 		// // this.chunks = new ConcurrentHashMap<>();
 
-		// System.setProperty("javax.net.ssl.keyStore", "src/network/myKeyStore.jks");
-		// System.setProperty("javax.net.ssl.keyStorePassword", "123456");
+		System.setProperty("javax.net.ssl.trustStore", "src/network/truststore");
+		System.setProperty("javax.net.ssl.trustStorePassword", "123456");
+		System.setProperty("javax.net.ssl.keyStore", "src/network/server.keys");
+		System.setProperty("javax.net.ssl.keyStorePassword", "123456");
 		
 		startWorkers();
-		
 	}
 
 

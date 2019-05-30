@@ -103,7 +103,9 @@ public class MessageHandler extends Thread{
 		SSLSocketFactory factory = (SSLSocketFactory)SSLSocketFactory.getDefault();
 		SSLSocket ssocket;
 
-		ssocket = (SSLSocket) factory.createSocket(address_ip, port);
+		InetSocketAddress isa = new InetSocketAddress(address_ip, port);
+		ssocket = (SSLSocket) factory.createSocket();
+		ssocket.connect(isa, 5000);
 		return ssocket;
 	}
 	
@@ -116,7 +118,7 @@ public class MessageHandler extends Thread{
 			System.out.println("1");
 			ObjectOutputStream out_stream = new ObjectOutputStream(ssocket.getOutputStream());
 			System.out.println("2");
-			out_stream.writeObject(message);
+			// out_stream.writeObject(message);
 			System.out.println("3");
 		}catch(IOException e){
 			System.err.println(e.getMessage());
