@@ -34,8 +34,6 @@ public class Server {
 
 		System.setProperty("javax.net.ssl.keyStore", "src/network/myKeyStore.jks");
 		System.setProperty("javax.net.ssl.keyStorePassword", "123456");
-		//Optional
-		//System.setProperty("java.net.debug", "all");
 
 		try{
 
@@ -44,6 +42,11 @@ public class Server {
 			System.out.println("Echo Server Started & Ready to accept Client Connection"); 
 
 			while(true){
+
+				//Require client authentication
+				//sslServerSocket.setNeedClientAuth(true);
+
+				//sslServerSocket.setNeedClientAuth(true);
 
 				SSLSocket sslSocket = (SSLSocket)sslServerSocket.accept();
 

@@ -41,7 +41,7 @@ public class Peer implements RemoteService{
 
 		System.setProperty("javax.net.ssl.trustStore", "src/network/myTrustStore.jts");
 		System.setProperty("javax.net.ssl.trustStorePassword", "123456");
-		//System.setProperty("javax.net.debug", "all");
+
 
 		try{
 
@@ -53,6 +53,7 @@ public class Peer implements RemoteService{
 			DataInputStream inputStream = new DataInputStream(sslSocket.getInputStream());
 
 			//sslSocket.startHandshake();
+			
 			while(true){
 				System.out.println(inputStream.readUTF());
 				String tosend = scn.nextLine();
