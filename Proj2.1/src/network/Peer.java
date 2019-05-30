@@ -4,7 +4,6 @@ import service.RemoteService;
 import network.workers.MessageHandler;
 import network.workers.Listener;
 
-
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Scanner;
 
@@ -20,7 +19,7 @@ import java.net.Socket;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 
-public class Peer implements Node{
+public class Peer implements Node, RemoteService{
 
 	private int peerID;
 
@@ -71,23 +70,23 @@ public class Peer implements Node{
 	}
 
 
-	// @Override
-	// public void backup(String path){
+	@Override
+	public void backup(String path){
 
-	// 	System.out.println("backup");
-	// }
+		System.out.println("backup");
+	}
 
-	// @Override
-	// public void delete(String path){
+	@Override
+	public void delete(String path){
 
-	// 	System.out.println("delete");
-	// }
+		System.out.println("delete");
+	}
 
-	// @Override
-	// public void restore(String path){
+	@Override
+	public void restore(String path){
 
-	// 	System.out.println("restore");
-	// }
+		System.out.println("restore");
+	}
 
 	@Override
 	public InetSocketAddress getLocalAddress(){
