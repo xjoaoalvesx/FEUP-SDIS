@@ -2,6 +2,7 @@ package network;
 
 import service.RemoteService;
 import network.workers.MessageHandler;
+import network.workers.Listener;
 
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,7 +20,7 @@ import java.net.Socket;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 
-public class Peer implements RemoteService{
+public class Peer implements Node{
 
 	private int peerID;
 
@@ -29,6 +30,7 @@ public class Peer implements RemoteService{
 	private final InetSocketAddress peerAddress;
 
 	private MessageHandler messageHandler;
+	private Listener listener;
 
 	public Peer(int peerID, InetSocketAddress address, String serverIP, int serverPort){
 
@@ -38,41 +40,9 @@ public class Peer implements RemoteService{
 		this.serverPort = serverPort;
 
 		this.messageHandler = new MessageHandler(this);
+		this.listener = new Listener(this, messageHandler);
 
-		System.setProperty("javax.net.ssl.trustStore", "src/network/myTrustStore.jts");
-		System.setProperty("javax.net.ssl.trustStorePassword", "123456");
-		//System.setProperty("javax.net.debug", "all");
-
-		try{
-
-			Scanner scn = new Scanner(System.in);
-
-			SSLSocketFactory sslsocketfactory = (SSLSocketFactory)SSLSocketFactory.getDefault();
-			SSLSocket sslSocket = (SSLSocket)sslsocketfactory.createSocket(this.serverIP,this.serverPort);
-			DataOutputStream outputStream = new DataOutputStream(sslSocket.getOutputStream());
-			DataInputStream inputStream = new DataInputStream(sslSocket.getInputStream());
-
-			//sslSocket.startHandshake();
-			while(true){
-				System.out.println(inputStream.readUTF());
-				String tosend = scn.nextLine();
-				outputStream.writeUTF(tosend);
-
-				if(tosend.equals("Exit")){
-					System.out.println("Closing this connection : " + sslSocket);
-					sslSocket.close();
-					break;
-				}
-
-			}
-			scn.close();
-			inputStream.close();
-			outputStream.close();
-		}
-		catch(IOException ioException){
-
-			ioException.printStackTrace();
-		}
+		startWorkers();
 	}
 
 
@@ -83,28 +53,44 @@ public class Peer implements RemoteService{
 
 	// 	System.out.println("Joining Server at " + server);
 
-	// 	if(server == null || server.equals())
+	// 	if(server == null || server.equals(getLocalAddress())){
+	// 		System.out.println("Failed to register to server");
+	// 	}
+
+	// 	Message request = Message.request(Message.Type.REGISTER, peerAddress);
+
+	// 	messageHandler.
 
 
 	// }
 
-
 	@Override
-	public void backup(String path){
-
-		System.out.println("backup");
+	public void startWorkers(){
+		listener.start();
 	}
 
+
+	// @Override
+	// public void backup(String path){
+
+	// 	System.out.println("backup");
+	// }
+
+	// @Override
+	// public void delete(String path){
+
+	// 	System.out.println("delete");
+	// }
+
+	// @Override
+	// public void restore(String path){
+
+	// 	System.out.println("restore");
+	// }
+
 	@Override
-	public void delete(String path){
-
-		System.out.println("delete");
-	}
-
-	@Override
-	public void restore(String path){
-
-		System.out.println("restore");
+	public InetSocketAddress getLocalAddress(){
+		return this.peerAddress;
 	}
 
 }

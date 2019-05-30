@@ -2,6 +2,8 @@ package network.workers;
 
 import network.Message;
 import network.Peer;
+import network.Server;
+import network.Node;
 
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
@@ -18,18 +20,17 @@ import java.util.concurrent.Executors;
 
 public class MessageHandler extends Thread{
 	
-	private Peer peer;
+	private Node node;
 	private ExecutorService executor;
 
 
-	public MessageHandler(Peer peer){
-		this.peer = peer;
+	public MessageHandler(Node peer){
+		this.node = peer;
 		this.executor = Executors.newFixedThreadPool(3);
-
 	}
 
-	
-	public Message request(InetSocketAddress address, Message message){
+
+	public Message dispatchRequest(InetSocketAddress address, Message message){
 
 		if(!message.isRequest()){
 			throw new IllegalArgumentException("Invalid type of Message to be sent.");
@@ -44,7 +45,7 @@ public class MessageHandler extends Thread{
 		}
 
 		Message response = null;
-		
+
 		try{
 			response = getResponseMessage(ssocket);
 		}catch(IOException e){
@@ -65,7 +66,15 @@ public class MessageHandler extends Thread{
 
 
 
+	public void manageResponse(Message message){
 
+	}
+
+
+	public Message manageRequest(Message message){
+
+		return null;
+	}
 
 
 	// socket send and socket receive functions

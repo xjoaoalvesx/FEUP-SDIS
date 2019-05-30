@@ -45,11 +45,11 @@ public class StartPeer {
 
 			try {
 				Peer peer = new Peer(peerID, new InetSocketAddress(inetAd, port), serverIP, serverPort);
-				RemoteService stub = (RemoteService) UnicastRemoteObject.exportObject(peer, 0);
+				// RemoteService stub = (RemoteService) UnicastRemoteObject.exportObject(peer, 0);
 
-				Registry registry = LocateRegistry.getRegistry();
-				String name = "P" + String.valueOf(peerID);
-				registry.rebind(name, stub); // rebind for testing (change to bind if necessary)
+				// Registry registry = LocateRegistry.getRegistry();
+				// String name = "P" + String.valueOf(peerID);
+				// registry.rebind(name, stub); // rebind for testing (change to bind if necessary)
 				System.out.println("Peer " + peerID + " has been created on the " + port + " port.");
 			} catch(Exception e){
 				System.out.println("Server exception: " + e.toString());

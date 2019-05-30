@@ -1,5 +1,8 @@
 package network;
 
+import network.workers.Listener;
+import network.workers.MessageHandler;
+
 import java.io.*;
 import java.net.*;
 import java.util.concurrent.*;
@@ -9,11 +12,13 @@ import javax.xml.crypto.Data;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 
-public class Server {
+public class Server implements Node{
 
 	private InetSocketAddress server_address;
 	private int port;
 	private String ip;
+	private MessageHandler messageHandler;
+	private Listener listener;
 	//private ServerSocket serverSocket;
 
 	private ConcurrentHashMap<Integer, ConcurrentHashMap<Integer, String>> peers; 	// ID -> port, ip
@@ -26,51 +31,32 @@ public class Server {
 		this.port = server_address.getPort();
 		this.ip = server_address.getAddress().getHostAddress();
 
+		this.messageHandler = new MessageHandler(this);
+		this.listener = new Listener(this, messageHandler);
+
 		System.out.println("Server IP: " + ip);
 
 		this.peers = new ConcurrentHashMap<>();
 		// this.files = new ConcurrentHashMap<>();
-		// this.chunks = new ConcurrentHashMap<>();
+		// // this.chunks = new ConcurrentHashMap<>();
 
-		System.setProperty("javax.net.ssl.keyStore", "src/network/myKeyStore.jks");
-		System.setProperty("javax.net.ssl.keyStorePassword", "123456");
-		//Optional
-		//System.setProperty("java.net.debug", "all");
-
-		try{
-
-			SSLServerSocketFactory sslServerSocketfactory = (SSLServerSocketFactory)SSLServerSocketFactory.getDefault();
-			SSLServerSocket sslServerSocket = (SSLServerSocket)sslServerSocketfactory.createServerSocket(this.port,50,InetAddress.getLocalHost());
-			System.out.println("Echo Server Started & Ready to accept Client Connection"); 
-
-			while(true){
-
-				SSLSocket sslSocket = (SSLSocket)sslServerSocket.accept();
-
-				try{
-
-					System.out.println("A new client is connected : " + sslSocket);
-
-					DataInputStream inputStream = new DataInputStream(sslSocket.getInputStream());
-					DataOutputStream outputStream = new DataOutputStream(sslSocket.getOutputStream());
-					
-					System.out.println("Assigning a new thread for this client");
-
-					Thread t = new PeerHandler(sslSocket, inputStream, outputStream);
-
-					t.start();
-				}
-				catch(Exception e){
-					sslSocket.close();
-					e.printStackTrace();
-				}
-			}
-		}
-		catch(IOException ioException){
-
-			ioException.printStackTrace();
-		}
+		// System.setProperty("javax.net.ssl.keyStore", "src/network/myKeyStore.jks");
+		// System.setProperty("javax.net.ssl.keyStorePassword", "123456");
 		
+		startWorkers();
+		
+	}
+
+
+
+	@Override
+	public void startWorkers(){
+		listener.start();
+	}
+
+	@Override
+	public InetSocketAddress getLocalAddress(){
+		return this.server_address;
 	}
 
 	
