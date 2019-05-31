@@ -82,7 +82,6 @@ public class PeerSystemManager{
     }
 
     public static Chunk[] check(String filepath, int repD) throws IOException{
-        System.out.println(filepath);
         File file = new File(filepath);
         Chunk[] empty = {}; 
 

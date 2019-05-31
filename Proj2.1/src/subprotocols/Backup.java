@@ -23,7 +23,7 @@ public class Backup implements Runnable{
     this.parentPeer = parentPeer;
     this.path = path;
     this.repDeg = replicationDegree;
-    System.out.println("The Backup Started.");
+    System.out.println("BACKUP FILE STARTED -> " + this.path + " .");
   }
 
   @SuppressWarnings("unchecked")
@@ -65,7 +65,7 @@ public class Backup implements Runnable{
     }
 
 
-
-    System.out.println("backup run");
+    
+    System.out.println("--COMPLETED BACKUP--\n");
   }
 }
