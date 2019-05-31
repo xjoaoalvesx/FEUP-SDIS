@@ -145,23 +145,20 @@ public class Message implements Serializable{
 		return message;
 	}
 
-<<<<<<< Updated upstream:Proj2/src/network/Message.java
 	public static Message deleteInfoResponse(Type t, InetSocketAddress senderAddress, String fileId){
 		Message message = new Message(t);
 		message.sender = senderAddress;
 		message.data = fileId;
-=======
+		return message;
+	}
 	public static Message restoreRequest(Type t, InetSocketAddress senderAddress, String filePath){
 		Message message = new Message(t);
 		message.sender = senderAddress;
 		message.data = filePath;
->>>>>>> Stashed changes:Proj2.1/src/network/Message.java
 		message.isOfTypeRequest = true;
 		return message;
 	}
 
-<<<<<<< Updated upstream:Proj2/src/network/Message.java
-=======
 	public static Message restoreResponse(Type t, InetSocketAddress senderAddress, ArrayList<InetSocketAddress> peersToRestore){
 		Message message = new Message(t);
 		message.sender = senderAddress;
@@ -178,7 +175,6 @@ public class Message implements Serializable{
 		return message;
 	}
 
->>>>>>> Stashed changes:Proj2.1/src/network/Message.java
 
 	public int getIdentifier(){
 		return identifier;

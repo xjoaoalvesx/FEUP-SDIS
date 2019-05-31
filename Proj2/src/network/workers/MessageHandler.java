@@ -117,13 +117,11 @@ public class MessageHandler extends Thread{
 			case FILE:
 				response = manageFileRequest(message);
 				break;
-<<<<<<< Updated upstream:Proj2/src/network/workers/MessageHandler.java
 
 			case DELETE_INFO:
 				response = getDeleteInfoMessage(message);
 				break;
 
-=======
 			case RESTORE:
 				response = manageRestoreRequest(message);
 				break;
@@ -131,7 +129,6 @@ public class MessageHandler extends Thread{
 			case ASK_FILE:
 				response = manageAskFileRequest(message);
 				break;
->>>>>>> Stashed changes:Proj2.1/src/network/workers/MessageHandler.java
 			default:
 				break;
 		}

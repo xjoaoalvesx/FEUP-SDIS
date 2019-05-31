@@ -104,7 +104,7 @@ public class Server implements Node{
 		}
 
 		return list;
-}
+	}
 
 	@Override
 	public ArrayList<InetSocketAddress> getBackupFilesMap(String filePath){

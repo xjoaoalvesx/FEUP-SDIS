@@ -50,12 +50,7 @@ public class Backup implements Runnable{
 
     ArrayList<InetSocketAddress> peers;
     peers = backupToServer(parentPeer.getServerAddress());
-<<<<<<< Updated upstream:Proj2/src/subprotocols/Backup.java
-    if(peers.size() - 1 >= this.repDeg){
-=======
-    System.out.println(peers.size());
     if(peers.size()-1 >= this.repDeg){
->>>>>>> Stashed changes:Proj2.1/src/subprotocols/Backup.java
       for(int i = 0; i < peers.size(); i++){
 
         if(! peers.get(i).equals(parentPeer.getLocalAddress())){
@@ -69,7 +64,6 @@ public class Backup implements Runnable{
     }else {
       System.out.println("Error : No enough peers for corresponding replication degree");
     }
-
 
 
     System.out.println("--COMPLETED BACKUP--\n");
