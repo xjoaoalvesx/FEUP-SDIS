@@ -76,7 +76,7 @@ public class MessageHandler extends Thread{
 
 			case RECEIVED:
 				System.out.println("Received SAVECHUNK response\n");
-
+				break;
 			default:
 				break;
 		}
@@ -170,8 +170,7 @@ public class MessageHandler extends Thread{
 		if(saved){
 
 			Message saveChunkResponse = manageSaveChunk(chunk.getFileID(), chunk.getFilePath(), node.getLocalAddress());
-			Message response = this.dispatchRequest(node.getServerAddress(), saveChunkResponse);
-		}
+			Message response = this.dispatchRequest(node.getServerAddress(), saveChunkResponse);		}
 	}
 
 	private Message manageSaveChunk(String fileId, String filePath, InetSocketAddress sender){
@@ -254,7 +253,9 @@ public class MessageHandler extends Thread{
 		node.addBackupFile(fileId, request.getSender());
 		node.addFile(fileId, filePath);
 
+		System.out.println(request.getSender());
+		System.out.println(request.getSender());
 
-		return Message.response(Message.Type.RECEIVED, node.getLocalAddress(), node.getId());
+		return Message.receivedResponse(Message.Type.RECEIVED, node.getLocalAddress());
 	}
 }

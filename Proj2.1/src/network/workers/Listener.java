@@ -109,6 +109,7 @@ public class Listener extends Thread {
 
 		Message response = null;
 
+
 		if(message.isRequest()){
 			response = messageHandler.manageRequest(message);
 		}else{

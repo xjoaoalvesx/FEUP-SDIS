@@ -135,6 +135,14 @@ public class Message implements Serializable{
 		return message;
 	}
 
+	public static Message receivedResponse(Type t, InetSocketAddress senderAddress){
+		Message message = new Message(t);
+		message.sender = senderAddress;
+		message.data = null;
+		message.isOfTypeRequest = false;
+		return message;
+	}
+
 
 	public int getIdentifier(){
 		return identifier;

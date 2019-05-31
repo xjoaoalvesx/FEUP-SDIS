@@ -23,6 +23,7 @@ public class Backup implements Runnable{
     this.parentPeer = parentPeer;
     this.path = path;
     this.repDeg = replicationDegree;
+    System.out.println(repDeg);
     System.out.println("BACKUP FILE STARTED -> " + this.path + " .");
   }
 
@@ -50,18 +51,22 @@ public class Backup implements Runnable{
 
     ArrayList<InetSocketAddress> peers;
     peers = backupToServer(parentPeer.getServerAddress());
+    System.out.println(peers.size());
+    if(peers.size() - 1 >= this.repDeg){
+      for(int i = 0; i < peers.size(); i++){
 
-    for(int i = 0; i < peers.size(); i++){
+        if(! peers.get(i).equals(parentPeer.getLocalAddress())){
+          for(int j = 0; j < chunks.length; j++){
 
-      if(! peers.get(i).equals(parentPeer.getLocalAddress())){
-        for(int j = 0; j < chunks.length; j++){
-
-          Message request = Message.chunkRequest(Message.Type.CHUNK, parentPeer.getLocalAddress(), chunks[j]);
-          Message response = parentPeer.getMessageHandler().dispatchRequest(peers.get(i), request);
-          // System.out.print("response Message Type: ");
-          // System.out.println(response.getMessageType());
+            Message request = Message.chunkRequest(Message.Type.CHUNK, parentPeer.getLocalAddress(), chunks[j]);
+            Message response = parentPeer.getMessageHandler().dispatchRequest(peers.get(i), request);
+            // System.out.print("response Message Type: ");
+            // System.out.println(response.getMessageType());
+          }
         }
       }
+    }else {
+      System.out.println("Error : No enough peers for corresponding replication degree");
     }
 
 
