@@ -51,7 +51,7 @@ public class TestApp implements Runnable{
 
 	public static void main(String[] args){
 
-		if(args.length != 2){
+		if(args.length != 4){
 
 			System.out.println("Usage:");
 			System.out.println("\tjava -classpath bin service.Client <peer_id> <subprotocol> <opnd_1> <opnd_2>");
