@@ -24,7 +24,7 @@ public class Server implements Node{
 	//private ServerSocket serverSocket;
 
 	private ConcurrentHashMap<Integer, InetSocketAddress> peers; 	// ID -> port, ip
-	private ConcurrentHashMap<String, Set<InetSocketAddress>> backup_files_map; // filepath -> set(peers(have the key file))
+	private ConcurrentHashMap<String, Set<InetSocketAddress>> backup_files_map; // fileId -> set(peers(have the key file))
 	private ConcurrentMap<String, String> files_map; // filePath -> fileId
 
 	public Server(InetSocketAddress address){
@@ -67,6 +67,23 @@ public class Server implements Node{
 	}
 
 	@Override
+	public void removeInfoFromServer(String fileId, InetSocketAddress peer_add){
+
+		String filePath = null;
+		for (Map.Entry<String, String> entry : files_map.entrySet()) {
+      filePath = entry.getKey().toString();
+			if(filePath.equals(fileId))
+				break;
+    }
+
+		if(files_map.containsKey(filePath))
+			files_map.remove(filePath);
+
+		if(backup_files_map.containsKey(fileId))
+			backup_files_map.remove(fileId);
+	}
+
+	@Override
 	public void addFile(String fileId, String filePath){
 		files_map.putIfAbsent(filePath, fileId);
 	}
@@ -74,7 +91,7 @@ public class Server implements Node{
 	@Override
 	public String getFile(String filePath){
 		return files_map.get(filePath);
-	}	
+	}
 
 
 	@Override

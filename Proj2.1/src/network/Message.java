@@ -33,7 +33,8 @@ public class Message implements Serializable{
 		SAVECHUNK,
 		FILE,
 		DELETE_FILE,
-		RECEIVED
+		RECEIVED,
+		DELETE_INFO
 	}
 
 
@@ -140,6 +141,14 @@ public class Message implements Serializable{
 		message.sender = senderAddress;
 		message.data = null;
 		message.isOfTypeRequest = false;
+		return message;
+	}
+
+	public static Message deleteInfoResponse(Type t, InetSocketAddress senderAddress, String fileId){
+		Message message = new Message(t);
+		message.sender = senderAddress;
+		message.data = fileId;
+		message.isOfTypeRequest = true;
 		return message;
 	}
 

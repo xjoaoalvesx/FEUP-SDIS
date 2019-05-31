@@ -117,6 +117,11 @@ public class MessageHandler extends Thread{
 			case FILE:
 				response = manageFileRequest(message);
 				break;
+
+			case DELETE_INFO:
+				response = getDeleteInfoMessage(message);
+				break;
+
 			default:
 				break;
 		}
@@ -142,11 +147,23 @@ public class MessageHandler extends Thread{
 		}catch(IOException e){
 			System.out.println("Error removing folder");
 		}
-		
 
+		Message deleteInfoResponse = manageDeleteInfo(fileId, node.getLocalAddress());
+		Message response = this.dispatchRequest(node.getServerAddress(), deleteInfoResponse);
 	}
 
-	
+	private Message manageDeleteInfo(String fileId, InetSocketAddress sender){
+
+		return Message.deleteInfoResponse(Message.Type.DELETE_INFO, sender, fileId);
+	}
+
+	private Message getDeleteInfoMessage(Message response){
+
+		node.removeInfoFromServer((String) response.getMessageData(), response.getSender());
+		return Message.response(Message.Type.DELETE_INFO, node.getLocalAddress(), node.getId());
+	}
+
+
 
 	private void manageChunkRequest(Message request){
 
@@ -170,7 +187,8 @@ public class MessageHandler extends Thread{
 		if(saved){
 
 			Message saveChunkResponse = manageSaveChunk(chunk.getFileID(), chunk.getFilePath(), node.getLocalAddress());
-			Message response = this.dispatchRequest(node.getServerAddress(), saveChunkResponse);		}
+			Message response = this.dispatchRequest(node.getServerAddress(), saveChunkResponse);
+		}
 	}
 
 	private Message manageSaveChunk(String fileId, String filePath, InetSocketAddress sender){
@@ -252,9 +270,6 @@ public class MessageHandler extends Thread{
 
 		node.addBackupFile(fileId, request.getSender());
 		node.addFile(fileId, filePath);
-
-		System.out.println(request.getSender());
-		System.out.println(request.getSender());
 
 		return Message.receivedResponse(Message.Type.RECEIVED, node.getLocalAddress());
 	}

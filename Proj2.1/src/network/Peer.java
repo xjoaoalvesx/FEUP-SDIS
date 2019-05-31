@@ -126,6 +126,12 @@ public class Peer implements Node, RemoteService{
 	}
 
 	@Override
+	public void removeInfoFromServer(String fileId, InetSocketAddress peer_add){
+		System.out.println("SOU UM PEER ZECAS");
+		return;
+	}
+
+	@Override
 	public int getId(){
 		return this.peerID;
 	}

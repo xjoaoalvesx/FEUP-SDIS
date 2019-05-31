@@ -28,7 +28,7 @@ public interface Node {
 
 	public String getFile(String filePath);
 
-
 	public PeerSystemManager getManager();
 
+	public void removeInfoFromServer(String fileId, InetSocketAddress peer_add);
 }
