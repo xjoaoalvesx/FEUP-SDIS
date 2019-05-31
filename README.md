@@ -39,6 +39,13 @@ E.g.: java -classpath bin service.TestApp 1 BACKUP "files/test.txt" 1
 
 ##### Delete
 ```
-java -classpath bin service.TestApp <initiator_peer_id> <backup_protocol> <file_path>
+java -classpath bin service.TestApp <initiator_peer_id> <delete_protocol> <file_path>
 ```
 E.g.: java -classpath bin service.TestApp 1 DELETE "files/test.txt"
+
+
+##### Restore
+```
+java -classpath bin service.TestApp <initiator_peer_id> <restore_protocol> <file_path>
+```
+E.g.: java -classpath bin service.TestApp 1 RESTORE "files/test.txt"
