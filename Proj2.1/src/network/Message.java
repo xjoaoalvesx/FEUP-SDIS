@@ -22,7 +22,8 @@ public class Message implements Serializable{
 		DELETE,
 		RESTORE,
 		REGISTER,
-		ACCEPTED
+		ACCEPTED,
+		CHUNK
 	}
 
 
