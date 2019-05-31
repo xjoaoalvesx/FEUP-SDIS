@@ -36,7 +36,7 @@ public class Listener extends Thread {
 		this.messageHandler = handler;
 		this.sslsocket = startSSocket();
 
-		this.executor = Executors.newFixedThreadPool(5);
+		this.executor = Executors.newFixedThreadPool(8);
 	}
 
 	public SSLServerSocket startSSocket(){
@@ -73,6 +73,7 @@ public class Listener extends Thread {
 
 		SSLSocket socket;
 
+		System.out.println("1");
 		try{
 			socket = (SSLSocket) sslsocket.accept();
 
@@ -80,6 +81,7 @@ public class Listener extends Thread {
 			throw new RuntimeException("Connection failed!", e);
 		}
 
+		System.out.println("2");
 		executor.submit(() -> manageConnection(socket));
 	}
 
@@ -90,6 +92,7 @@ public class Listener extends Thread {
 		ObjectInputStream input_stream;
 		ObjectOutputStream output_stream;
 
+		System.out.println("3");
 		try{
 			input_stream = new ObjectInputStream(s.getInputStream());
 			output_stream = new ObjectOutputStream(s.getOutputStream());
@@ -97,6 +100,7 @@ public class Listener extends Thread {
 			throw new RuntimeException("Fail opening streams", e);
 		}
 
+		System.out.println("4");
 		Message message = null;
 
 		try{
@@ -107,6 +111,7 @@ public class Listener extends Thread {
 			e.printStackTrace();
 		}
 
+		System.out.println("5");
 		Message response = null;
 
 		if(message.isRequest()){
@@ -116,6 +121,7 @@ public class Listener extends Thread {
 			messageHandler.manageResponse(message);
 		}
 
+		System.out.println("6");
 		try{
 			output_stream.writeObject(response);
 			input_stream.close();
@@ -123,6 +129,8 @@ public class Listener extends Thread {
 		}catch(IOException e){
 			e.printStackTrace();
 		}
+
+		System.out.println("7");
 
 	}
 

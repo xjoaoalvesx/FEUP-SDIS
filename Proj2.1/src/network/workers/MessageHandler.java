@@ -87,7 +87,7 @@ public class MessageHandler extends Thread{
 			case REGISTER:
 				response = manageRegisterRequest(message);
 				break;
-		
+
 			case BACKUP:
 				response = manageBackupRequest(message);
 				break;
@@ -106,6 +106,8 @@ public class MessageHandler extends Thread{
 
 	private void manageChunkRequest(Message request){
 
+		System.out.println("request");
+		System.out.println(request);
 		Boolean saved;
 		Chunk chunk = (Chunk) request.getMessageData();
 
@@ -122,7 +124,7 @@ public class MessageHandler extends Thread{
             System.out.println("Fail saving the chunk!");
            	saved = false;
         }
-		
+
 
 	}
 
