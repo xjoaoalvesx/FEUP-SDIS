@@ -31,10 +31,14 @@ java -classpath bin service.TestApp <initiator_peer_id> <subprotocol> <opnd_1> [
 ```
 
 ##### Backup
-
-E.g.: java -classpath bin service.TestApp 1 BACKUP "files/test.txt" 2
+```
+java -classpath bin service.TestApp <initiator_peer_id> <backup_protocol> <file_path> <replication_degree>
+```
+E.g.: java -classpath bin service.TestApp 1 BACKUP "files/test.txt" 1
 
 
 ##### Delete
-
+```
+java -classpath bin service.TestApp <initiator_peer_id> <backup_protocol> <file_path>
+```
 E.g.: java -classpath bin service.TestApp 1 DELETE "files/test.txt"
