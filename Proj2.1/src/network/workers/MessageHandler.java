@@ -44,7 +44,7 @@ public class MessageHandler extends Thread{
 		SSLSocket ssocket = sendMessage(address, message);
 
 		try{
-			Thread.sleep(100);
+			Thread.sleep(300);
 		}catch(InterruptedException e){
 			e.printStackTrace();
 		}
@@ -106,6 +106,9 @@ public class MessageHandler extends Thread{
 				response = getSaveChunkMessage(message);
 				break;
 
+			case DELETE:
+				response = manageDeleteRequest(message);
+
 			default:
 				break;
 		}
@@ -128,27 +131,37 @@ public class MessageHandler extends Thread{
 
 		try {
     		saved = saveFile(Integer.toString(chunk.getID()), chunk_path, data);
-    } catch (IOException e) {
-        System.out.println("Fail saving the chunk!");
-       	saved = false;
-    }
+    	} catch (IOException e) {
+        	System.out.println("Fail saving the chunk!");
+       		saved = false;
+    	}
 
 		if(saved){
 
-			Message saveChunkResponse = manageSaveChunk(chunk.getFileID(), request.getSender());
+			Message saveChunkResponse = manageSaveChunk(chunk.getFileID(), chunk.getFilePath(), request.getSender());
 			Message response = this.dispatchRequest(node.getServerAddress(), saveChunkResponse);
 		}
 	}
 
-	private Message manageSaveChunk(String fileId, InetSocketAddress sender){
+	private Message manageSaveChunk(String fileId, String filePath, InetSocketAddress sender){
 
-		return Message.saveChunkResponse(Message.Type.SAVECHUNK, sender, fileId);
+		String file = filePath + " " + fileId;
+		return Message.saveChunkResponse(Message.Type.SAVECHUNK, sender, file);
+	}
+
+	private Message manageDeleteRequest(Message request){
+
+		System.out.println((String) request.getMessageData());
+		System.out.println(node.getBackupFilesMap((String) request.getMessageData()));
+		return Message.deleteResponse(Message.Type.DELETE, node.getLocalAddress(), node.getBackupFilesMap((String) request.getMessageData()));
 	}
 
 	private Message manageBackupRequest(Message request){
 
 		return Message.backupResponse(Message.Type.BACKUP, node.getLocalAddress(), node.getPeers());
 	}
+
+
 	private Message manageRegisterRequest(Message request){
 
 
@@ -204,7 +217,16 @@ public class MessageHandler extends Thread{
 
 	private Message getSaveChunkMessage(Message request){
 
-		node.addBackupFile((String) request.getMessageData(), request.getSender());
+		String aux = (String)request.getMessageData();
+		String[] file = aux.split(" ");
+		String filePath = file[0];
+		String fileId = file[1];
+		System.out.println(filePath);
+		System.out.println(fileId);
+
+		node.addBackupFile(fileId, request.getSender());
+		node.addFile(fileId, filePath);
+
 
 		return Message.response(Message.Type.RECEIVED, node.getLocalAddress(), node.getId());
 	}

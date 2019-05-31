@@ -74,6 +74,14 @@ public class Message implements Serializable{
 		return message;
 	}
 
+	public static Message deleteResponse(Type t, InetSocketAddress senderAddress, ArrayList<InetSocketAddress> peers){
+		Message message = new Message(t);
+		message.sender = senderAddress;
+		message.data = peers;
+		message.isOfTypeRequest = false;
+		return message;
+	}
+
 	public static Message chunkRequest(Type t, InetSocketAddress senderAddress, Chunk chunk){
 		Message message = new Message(t);
 		message.sender = senderAddress;
@@ -82,10 +90,19 @@ public class Message implements Serializable{
 		return message;
 	}
 
-	public static Message saveChunkResponse(Type t, InetSocketAddress senderAddress, String fileId){
+	public static Message deleteRequest(Type t, InetSocketAddress senderAddress, int id, String filePath){
 		Message message = new Message(t);
 		message.sender = senderAddress;
-		message.data = fileId;
+		message.identifier = id;
+		message.isOfTypeRequest = true;
+		message.data = filePath;
+		return message;
+	}
+
+	public static Message saveChunkResponse(Type t, InetSocketAddress senderAddress, String file){
+		Message message = new Message(t);
+		message.sender = senderAddress;
+		message.data = file;
 		message.isOfTypeRequest = true;
 		return message;
 	}

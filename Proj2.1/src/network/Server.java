@@ -12,6 +12,8 @@ import javax.xml.crypto.Data;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 
+import static filesystem.PeerSystemManager.encode;
+
 public class Server implements Node{
 
 	private InetSocketAddress server_address;
@@ -22,10 +24,8 @@ public class Server implements Node{
 	//private ServerSocket serverSocket;
 
 	private ConcurrentHashMap<Integer, InetSocketAddress> peers; 	// ID -> port, ip
-	private ConcurrentHashMap<String, Set<InetSocketAddress>> backup_files_map; // filedpath -> set(peers(have the key file))
-
-	//private ConcurrentMap<String, String> backedUpFiles; 								// fileID -> chunkID
-	// private ConcurrentHashMap<String, Integer> chunks; 							// chunkID -> ID
+	private ConcurrentHashMap<String, Set<InetSocketAddress>> backup_files_map; // filepath -> set(peers(have the key file))
+	private ConcurrentMap<String, String> files_map; // filePath -> fileId
 
 	public Server(InetSocketAddress address){
 
@@ -40,6 +40,7 @@ public class Server implements Node{
 
 		this.peers = new ConcurrentHashMap<>();
 		this.backup_files_map = new ConcurrentHashMap<>();
+		this.files_map = new ConcurrentHashMap<>();
 		// this.files = new ConcurrentHashMap<>();
 		// // this.chunks = new ConcurrentHashMap<>();
 
@@ -57,7 +58,6 @@ public class Server implements Node{
 	@Override
 	public void addPeer(InetSocketAddress peer_add , int idPeer){
 		peers.putIfAbsent(idPeer, peer_add);
-		System.out.println(peers);
 	}
 
 	@Override
@@ -65,6 +65,17 @@ public class Server implements Node{
 		backup_files_map.putIfAbsent(fileId, new HashSet<InetSocketAddress>());
 		backup_files_map.get(fileId).add(peer_add);
 	}
+
+	@Override
+	public void addFile(String fileId, String filePath){
+		files_map.putIfAbsent(filePath, fileId);
+	}
+
+	@Override
+	public String getFile(String filePath){
+		return files_map.get(filePath);
+	}	
+
 
 	@Override
 	public ArrayList<InetSocketAddress> getPeers(){
@@ -79,7 +90,10 @@ public class Server implements Node{
 }
 
 	@Override
-	public ArrayList<InetSocketAddress> getBackupFilesMap(String fileID){
+	public ArrayList<InetSocketAddress> getBackupFilesMap(String filePath){
+
+		String fileID = getFile(filePath);
+		System.out.println(fileID);
 
 		ArrayList<InetSocketAddress> list = new ArrayList<>();
 

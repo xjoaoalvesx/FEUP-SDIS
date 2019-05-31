@@ -29,7 +29,7 @@ public class Backup implements Runnable{
   @SuppressWarnings("unchecked")
   public ArrayList<InetSocketAddress> backupToServer(InetSocketAddress server){
 
-    System.out.println("\nRequesting Backup to Server\n");
+    System.out.println("\nRequesting BACKUP to Server...\n");
 
     Message request = Message.request(Message.Type.BACKUP, parentPeer.getLocalAddress(), parentPeer.getId());
 
