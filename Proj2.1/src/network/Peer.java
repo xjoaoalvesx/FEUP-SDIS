@@ -44,10 +44,8 @@ public class Peer implements Node, RemoteService{
 		this.messageHandler = new MessageHandler(this);
 		this.listener = new Listener(this, messageHandler);
 
-		System.out.println("Peer " + peerID + " has been created on the " + peerAddress.getPort() + " port.");
-
-
 		startWorkers();
+
 		registerToServer(serverAddress);
 	}
 
@@ -79,7 +77,7 @@ public class Peer implements Node, RemoteService{
 
 
 	@Override
-	public void backup(String path){
+	public void backup(String path, int replicationDegree){
 
 		System.out.println("backup");
 	}

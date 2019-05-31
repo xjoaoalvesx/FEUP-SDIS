@@ -56,8 +56,7 @@ public class StartPeer {
 
 				Registry registry = LocateRegistry.getRegistry();
 				String name = "P" + String.valueOf(peerID);
-				registry.rebind(name, stub); // rebind for testing (change to bind if necessary)
-				
+				registry.bind(name, stub); // rebind for testing (change to bind if necessary)
 			} catch(Exception e){
 				System.out.println("Server exception: " + e.toString());
 				System.exit(1);

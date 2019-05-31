@@ -4,10 +4,12 @@ import java.rmi.*;
 import java.rmi.registry.*;
 import java.util.*;
 
-public class Client implements Runnable{
+public class TestApp implements Runnable{
 
 	private String peerID;
-	private String protocol;
+	private String subprotocol;
+	private String opnd1;
+	private String opnd2;
 
 	private ArrayList<Runnable> protocolHandlers;
 	private int subProtocolIndex;
@@ -15,17 +17,19 @@ public class Client implements Runnable{
 	private RemoteService stub;
 
 
-	public Client(String peerID, String protocol){
+	public TestApp(String peerID, String subprotocol, String opnd1, String opnd2){
 
 		this.peerID = peerID;
-		this.protocol = protocol;
+		this.subprotocol = subprotocol;
+		this.opnd1 = opnd1;
+		this.opnd2 = opnd2;
 
 		protocolHandlers = new ArrayList<Runnable> ();
 		protocolHandlers.add(this::backupStart);
 		protocolHandlers.add(this::deleteStart);
 		protocolHandlers.add(this::restoreStart);
 
-		switch(protocol){
+		switch(subprotocol){
 
 			case "BACKUP":
 				this.subProtocolIndex = 0;
@@ -50,15 +54,17 @@ public class Client implements Runnable{
 		if(args.length != 2){
 
 			System.out.println("Usage:");
-			System.out.println("\tjava -classpath bin service.Client <peer_id> <protocol>");
+			System.out.println("\tjava -classpath bin service.Client <peer_id> <subprotocol> <opnd_1> <opnd_2>");
 			return;
 		}
 
 		String peerID = args[0];
 		String protocol = args[1];
+		String opnd1 = args[2];
+		String opnd2 = args[3];
 
-		Client client = new Client(peerID, protocol);
-		// new Thread(client).start();
+		TestApp testApp = new TestApp(peerID, protocol, opnd1, opnd2);
+		new Thread(testApp).start();
 	}
 
 	@Override
@@ -83,7 +89,7 @@ public class Client implements Runnable{
 
     	System.out.println("backupStart");
     	try {
-            stub.backup("path");
+            stub.backup(this.opnd1, Integer.parseInt(this.opnd2));
         } catch (RemoteException e) {
             System.err.println("Client exception: " + e.toString());
         }
@@ -93,7 +99,7 @@ public class Client implements Runnable{
 
     	System.out.println("deleteStart");
     	try {
-            stub.delete("path");
+            stub.delete(this.opnd1);
         } catch (RemoteException e) {
             System.err.println("Client exception: " + e.toString());
         }
@@ -103,7 +109,7 @@ public class Client implements Runnable{
 
     	System.out.println("restoreStart");
     	try {
-            stub.restore("path");
+            stub.restore(this.opnd1);
         } catch (RemoteException e) {
             System.err.println("Client exception: " + e.toString());
         }
