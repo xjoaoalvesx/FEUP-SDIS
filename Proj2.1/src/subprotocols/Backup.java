@@ -58,12 +58,14 @@ public class Backup implements Runnable{
 
           Message request = Message.chunkRequest(Message.Type.CHUNK, parentPeer.getLocalAddress(), chunks[j]);
           Message response = parentPeer.getMessageHandler().dispatchRequest(peers.get(i), request);
+          // System.out.print("response Message Type: ");
+          // System.out.println(response.getMessageType());
         }
       }
     }
 
 
-    
+
     System.out.println("backup run");
   }
 }

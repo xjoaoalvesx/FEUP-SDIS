@@ -109,6 +109,7 @@ public class Peer implements Node, RemoteService{
 		return this.peerAddress;
 	}
 
+	@Override
 	public InetSocketAddress getServerAddress(){
 		return this.serverAddress;
 	}
@@ -120,7 +121,7 @@ public class Peer implements Node, RemoteService{
 
 	@Override
 	public void addPeer(InetSocketAddress peer_add , int idPeer){
-		return ;
+		return;
 	}
 
 	@Override
@@ -132,4 +133,13 @@ public class Peer implements Node, RemoteService{
 		return this.messageHandler;
 	}
 
+	@Override
+	public void addBackupFile(String fileId, InetSocketAddress peer_add){
+		return;
+	}
+
+	@Override
+	public ArrayList<InetSocketAddress> getBackupFilesMap(String fileID){
+		return null;
+	}
 }

@@ -19,7 +19,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 
 public class Message implements Serializable{
-	
+
 	static final long serialVersionUID = 214321L;
 
 
@@ -30,7 +30,8 @@ public class Message implements Serializable{
 		REGISTER,
 		ACCEPTED,
 		CHUNK,
-		SAVECHUNK
+		SAVECHUNK,
+		RECEIVED
 	}
 
 
@@ -77,6 +78,14 @@ public class Message implements Serializable{
 		Message message = new Message(t);
 		message.sender = senderAddress;
 		message.data = chunk;
+		message.isOfTypeRequest = true;
+		return message;
+	}
+
+	public static Message saveChunkResponse(Type t, InetSocketAddress senderAddress, String fileId){
+		Message message = new Message(t);
+		message.sender = senderAddress;
+		message.data = fileId;
 		message.isOfTypeRequest = true;
 		return message;
 	}

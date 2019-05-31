@@ -22,6 +22,8 @@ public class Server implements Node{
 	//private ServerSocket serverSocket;
 
 	private ConcurrentHashMap<Integer, InetSocketAddress> peers; 	// ID -> port, ip
+	private ConcurrentHashMap<String, Set<InetSocketAddress>> backup_files_map; // filedpath -> set(peers(have the key file))
+
 	//private ConcurrentMap<String, String> backedUpFiles; 								// fileID -> chunkID
 	// private ConcurrentHashMap<String, Integer> chunks; 							// chunkID -> ID
 
@@ -37,6 +39,7 @@ public class Server implements Node{
 		System.out.println("Server IP: " + ip);
 
 		this.peers = new ConcurrentHashMap<>();
+		this.backup_files_map = new ConcurrentHashMap<>();
 		// this.files = new ConcurrentHashMap<>();
 		// // this.chunks = new ConcurrentHashMap<>();
 
@@ -44,8 +47,8 @@ public class Server implements Node{
 		System.setProperty("javax.net.ssl.keyStorePassword", "123456");
 		System.setProperty("javax.net.ssl.trustStore", "src/network/truststore");
 		System.setProperty("javax.net.ssl.trustStorePassword", "123456");
-		
-		
+
+
 		startWorkers();
 	}
 
@@ -58,12 +61,32 @@ public class Server implements Node{
 	}
 
 	@Override
+	public void addBackupFile(String fileId, InetSocketAddress peer_add){
+		backup_files_map.putIfAbsent(fileId, new HashSet<InetSocketAddress>());
+		backup_files_map.get(fileId).add(peer_add);
+	}
+
+	@Override
 	public ArrayList<InetSocketAddress> getPeers(){
 
 		ArrayList<InetSocketAddress> list = new ArrayList<>();
 
 		for (Map.Entry<Integer, InetSocketAddress> entry : peers.entrySet()) {
     		list.add(entry.getValue());
+		}
+
+		return list;
+}
+
+	@Override
+	public ArrayList<InetSocketAddress> getBackupFilesMap(String fileID){
+
+		ArrayList<InetSocketAddress> list = new ArrayList<>();
+
+		Set<InetSocketAddress> isa = backup_files_map.get(fileID);
+
+		for (InetSocketAddress i : isa){
+			list.add(i);
 		}
 
 		return list;
@@ -85,50 +108,11 @@ public class Server implements Node{
 		return 1;
 	}
 
+	@Override
+	public InetSocketAddress getServerAddress(){
+		return this.server_address;
+	}
 
-	
+
+
 }
-
-// class PeerHandler extends Thread{
-	
-// 	private SSLSocket ssl;
-// 	private DataInputStream input;
-// 	private DataOutputStream output;
-
-// 	public PeerHandler(SSLSocket s, DataInputStream input, DataOutputStream output){
-// 		this.ssl = s;
-// 		this.input = input;
-// 		this.output = output;
-// 	}
-
-//     @Override
-//     public void run()  
-//     { 
-// 		String received;
-// 		String toreturn;
-
-//         while (true)  
-//         { 
-//             try { 
-// 				output.writeUTF("Write Exit to terminate connection");
-// 				received = input.readUTF();
-
-// 				if(received.equals("Exit")){
-// 					System.out.println("Client " + this.ssl + "sends exit...");
-// 					this.ssl.close();
-// 					System.out.println("Connection closed");
-// 					break;
-// 				}
-				
-//             } catch (IOException e) { 
-//                 e.printStackTrace(); 
-//             } 
-// 		}
-// 		try{
-// 			this.input.close();
-// 			this.output.close();
-// 		}catch(IOException e){
-// 			e.printStackTrace();
-// 		}
-//     }
-// }

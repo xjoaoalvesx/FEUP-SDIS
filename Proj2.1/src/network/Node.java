@@ -4,7 +4,7 @@ import java.net.InetSocketAddress;
 import java.util.ArrayList;
 
 public interface Node {
-	
+
 
 	InetSocketAddress getLocalAddress();
 
@@ -16,4 +16,9 @@ public interface Node {
 
 	public int getId();
 
+	public InetSocketAddress getServerAddress();
+
+	public void addBackupFile(String fileId, InetSocketAddress peer_add);
+
+	public ArrayList<InetSocketAddress> getBackupFilesMap(String fileID);
 }

@@ -57,23 +57,29 @@ public class MessageHandler extends Thread{
 			System.out.println("Could not get response");
 		}
 
-
 		try{
 			ssocket.close();
 		}catch(IOException e){
 			e.printStackTrace();
 		}
 
-
 		return response;
-
 	}
 
 
 
 	public void manageResponse(Message message){
 
+		System.out.println("Received Request " + message.getMessageType() + " Message.");
 
+		switch(message.getMessageType()){
+
+			case RECEIVED:
+				System.out.println("Received SAVECHUNK response\n");
+
+			default:
+				break;
+		}
 	}
 
 
@@ -94,6 +100,10 @@ public class MessageHandler extends Thread{
 
 			case CHUNK:
 				executor.submit(() -> manageChunkRequest(message));
+				break;
+
+			case SAVECHUNK:
+				response = getSaveChunkMessage(message);
 				break;
 
 			default:
@@ -118,12 +128,21 @@ public class MessageHandler extends Thread{
 
 		try {
     		saved = saveFile(Integer.toString(chunk.getID()), chunk_path, data);
-        } catch (IOException e) {
-            System.out.println("Fail saving the chunk!");
-           	saved = false;
-        }
+    } catch (IOException e) {
+        System.out.println("Fail saving the chunk!");
+       	saved = false;
+    }
 
+		if(saved){
 
+			Message saveChunkResponse = manageSaveChunk(chunk.getFileID(), request.getSender());
+			Message response = this.dispatchRequest(node.getServerAddress(), saveChunkResponse);
+		}
+	}
+
+	private Message manageSaveChunk(String fileId, InetSocketAddress sender){
+
+		return Message.saveChunkResponse(Message.Type.SAVECHUNK, sender, fileId);
 	}
 
 	private Message manageBackupRequest(Message request){
@@ -183,5 +202,10 @@ public class MessageHandler extends Thread{
 		return null;
 	}
 
+	private Message getSaveChunkMessage(Message request){
 
+		node.addBackupFile((String) request.getMessageData(), request.getSender());
+
+		return Message.response(Message.Type.RECEIVED, node.getLocalAddress(), node.getId());
+	}
 }
