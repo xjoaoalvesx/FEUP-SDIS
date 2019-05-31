@@ -117,11 +117,21 @@ public class MessageHandler extends Thread{
 			case FILE:
 				response = manageFileRequest(message);
 				break;
+<<<<<<< Updated upstream:Proj2/src/network/workers/MessageHandler.java
 
 			case DELETE_INFO:
 				response = getDeleteInfoMessage(message);
 				break;
 
+=======
+			case RESTORE:
+				response = manageRestoreRequest(message);
+				break;
+
+			case ASK_FILE:
+				response = manageAskFileRequest(message);
+				break;
+>>>>>>> Stashed changes:Proj2.1/src/network/workers/MessageHandler.java
 			default:
 				break;
 		}
@@ -207,7 +217,28 @@ public class MessageHandler extends Thread{
 		return Message.backupResponse(Message.Type.BACKUP, node.getLocalAddress(), node.getPeers());
 	}
 
+	private Message manageRestoreRequest(Message request){
 
+		return Message.restoreResponse(Message.Type.RESTORE, node.getLocalAddress(), node.getBackupFilesMap((String) request.getMessageData()));
+
+	}
+
+	private Message manageAskFileRequest(Message request){
+
+		Chunk[] chunks = null;
+		byte[] file = null;
+
+		String file_id = (String) request.getMessageData();
+
+		try{
+			file = node.getManager().getFileFromSystem(file_id);
+		}catch(IOException e){
+			System.out.println("Error retrieving chunk data from folder");
+			return null;
+		}
+		return Message.askFileResponse(Message.Type.ASK_FILE, request.getSender(), file);
+
+	}
 	private Message manageRegisterRequest(Message request){
 
 

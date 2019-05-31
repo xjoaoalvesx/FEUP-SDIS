@@ -6,6 +6,7 @@ import network.workers.Listener;
 import filesystem.PeerSystemManager;
 import subprotocols.Backup;
 import subprotocols.Delete;
+import subprotocols.Restore;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Scanner;
@@ -102,7 +103,7 @@ public class Peer implements Node, RemoteService{
 	@Override
 	public void restore(String path){
 
-		System.out.println("restore");
+		executor.submit(new Restore(this, path));
 	}
 
 	@Override

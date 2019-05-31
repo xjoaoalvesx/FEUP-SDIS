@@ -1,57 +1,79 @@
-package service;
+package subprotocols;
 
 import network.Peer;
-import network.Server;
+import network.Message;
+import filesystem.Chunk;
+import static filesystem.PeerSystemManager.check;
+import static filesystem.PeerSystemManager.encode;
+
+import java.util.ArrayList;
+
+import java.io.IOException;
+
+import java.net.InetSocketAddress;
 
 public class Restore implements Runnable{
 	
 	private Peer peer;
-	private String file_id;
-	private String file_path;
+	private String path;
 
-	public Restore(Peer peer, String file_id, String file_path){
+	public Restore(Peer peer, String path){
 		this.peer = peer;
-		this.file_id = file_id;
-		this.file_path = file_path;
+		this.path = path;
+		System.out.println("RESTORE FILE STARTED -> " + this.path + " .");
 	}
 
+	@SuppressWarnings("unchecked")
+	public ArrayList<InetSocketAddress> restoreToServer(InetSocketAddress server){
+		
+		System.out.println("\nRequesting Restore to Server\n");
+
+		Message request = Message.restoreRequest(Message.Type.RESTORE, peer.getLocalAddress(), path);
+
+		Message response = peer.getMessageHandler().dispatchRequest(server, request);
+		return (ArrayList<InetSocketAddress>) response.getMessageData();
+	}
+
+	// public ArrayList<InetSocketAddress> getRestorePeer(){
+
+	// 	ArrayList<InetSocketAddress> list = new ArrayList<>();
+
+	// 	list = peer.getBackupFilesMap(this.fileID);
+
+	// 	return list;
+	// }
+
+	@Override
 	public void run(){
-		if(fileId == null){
-		    System.out.println("File not available to RESTORE!");
-		    return;
+		System.out.println("run");
+		ArrayList<InetSocketAddress> peers;
+		System.out.println("run1");
+		peers = restoreToServer(peer.getServerAddress());
+		System.out.println(peers);
+		if (peers.size() == 0){
+			System.out.print("No file to restore...");
+			return;
+		}
+
+		Message request_file_id = Message.fileRequest(Message.Type.FILE, peer.getLocalAddress(), peer.getId(), this.path);
+		Message response_file_id = peer.getMessageHandler().dispatchRequest(peer.getServerAddress(), request_file_id);
+		String file_id = (String) response_file_id.getMessageData();
+		System.out.println(file_id);
+
+		int i = 0;
+		Message request = Message.fileRequest(Message.Type.ASK_FILE, peer.getLocalAddress(), peer.getId(), file_id);
+        Message response = peer.getMessageHandler().dispatchRequest(peers.get(i), request);
+
+		byte[] file = (byte[]) response.getMessageData();
+		System.out.println(file.length);
+		System.out.println("restorefile");
+		String[] strings = this.path.split("/");
+		try{
+			peer.getManager().restoreFile(file, strings[strings.length - 1]);
+		}catch(Exception e){
+			e.printStackTrace();
 		}
 		
-		// TODO function that gets number of chunks
-	    	int num_chunks = 0;
-		
-		// ask where is all the stuff to the server Change bellow accordingly
-	    	for(int i = 0; i < num_chunks; i++){
-	    		sendGETCHUNKrequest(i);
-	    	}
 
-		while(!parent_peer.finishedRestoringFile(file_path, fileId)){
-		    Thread.yield();
-		}
-
-		System.out.println("All chunks have been received!");
-
-	   
-
-		try {
-		    String chunks_path = "peers/Peer" + peer.getId() + "/restored";
-		    Path path = Paths.get(file_path);
-		    String name = path.getFileName().toString();
-		    //join chuncks functions TODO
-
-		}catch(IOException e){
-		    System.out.println("Failed saving file");
-		}
-
-
-    	}
-
-
-	private void sendGETCHUNKrequest(){
-
-	}
+	}	
 }

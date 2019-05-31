@@ -333,7 +333,67 @@ public class PeerSystemManager{
 
     }
  
-    //returns free space
+    public byte[] getFileFromSystem(String fileId) throws IOException{
+       
+        String path_of_file = this.path + "backup/" + fileId;
+        int number_chunks = new File(path_of_file).list().length;
+        String[] children = new File(path_of_file).list();
+        byte[][] file_bytes = new byte[number_chunks][];
+
+        int c = 0;
+        for(String s : children){
+            String p = path_of_file + "/" + s;
+            byte[] temp_bytes = loadDataFromPath(p);
+            file_bytes[c] = temp_bytes;
+            c++;
+        }
+
+
+        int size = 0;
+        for (int i = 0; i < number_chunks; i++){
+            size += file_bytes[i].length;
+        }
+        byte[] file = new byte[size];
+        for (int i = 0; i < size; i++){
+            int count = 0;
+            for (int s = 0; s < file_bytes[i].length; s++){
+                file[i+s] = file_bytes[i][s];
+                count = s;
+            }
+            i += count;
+        }
+        return file;
+
+    }
+
+    public static byte[] loadDataFromPath(String path){
+        
+        byte[] getBytes = null;
+
+        try {
+            File file = new File(path);
+            System.out.println(file.length());
+            getBytes = new byte[(int) file.length()];
+            InputStream is = new FileInputStream(file);
+            is.read(getBytes);
+            is.close();
+        }catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return getBytes;
+    }
+
+    public void restoreFile(byte[] info, String path1) throws IOException {
+        String path_of_file = this.path + "restored/" + path1;
+        if (Files.exists(Paths.get(path_of_file))) {
+            return;
+        }        
+
+        OutputStream out = Files.newOutputStream(Paths.get(path_of_file));
+        out.write(info);
+        out.close();
+    }
     
 
     public String getPath(){
