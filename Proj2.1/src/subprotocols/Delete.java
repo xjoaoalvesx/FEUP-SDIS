@@ -1,37 +1,72 @@
-package service;
+package subprotocols;
 
 import network.Peer;
 import network.Server;
+import network.Message;
+
+import java.util.ArrayList;
+
+import java.io.IOException;
+
+import java.net.InetSocketAddress;
 
 public class Delete implements Runnable{
 	
 	private String file_path;
-	private String fileId;
+	private Peer peer;
 
 	public Delete(Peer peer, String filePath){
 
 		this.peer = peer;
 		this.file_path = filePath;
-		this.fileId = //TODO get id from system
+
+		System.out.println("DELETE FILE STARTED --- " + this.file_path + " .");
 
 	}
 
+	@SuppressWarnings("unchecked")
+	public ArrayList<InetSocketAddress> deleteToServer(InetSocketAddress server){
 
+		System.out.println("\nRequesting DELETE to SERVER\n");
+
+		Message request = Message.deleteRequest(Message.Type.DELETE, peer.getLocalAddress(), peer.getId(), this.file_path);
+
+		Message response = peer.getMessageHandler().dispatchRequest(server, request);
+
+		return (ArrayList<InetSocketAddress>) response.getMessageData();
+	}
+
+	public String requestFileToServer(InetSocketAddress server){
+
+		System.out.println("\nRequesting fileID to SERVER : " + this.file_path);
+
+		Message request = Message.deleteRequest(Message.Type.FILE, peer.getLocalAddress(), peer.getId(), this.file_path);
+		Message response = peer.getMessageHandler().dispatchRequest(server, request);
+
+		return (String) response.getMessageData();
+	}
+
+
+
+	@Override
 	public void run(){
-		if(fileId == null){
-		    System.out.println("DELETE canceled: file does not exist !");
-		    return;
-		}
+		
+		ArrayList<InetSocketAddress> peers;
+    	peers = deleteToServer(peer.getServerAddress());
 
-		sendDELETErequest();
+    	String fileId;
+    	fileId = requestFileToServer(peer.getServerAddress());
+    	System.out.println(fileId);
 
-		parent_peer.getPeerSystemManager().removeFileToRestore(file_path);
+    	for (int i = 0; i < peers.size(); i++){
 
-	    	System.out.println("Delete run");
+    		Message request = Message.deleteFileRequest(Message.Type.DELETE_FILE, peer.getLocalAddress(), fileId);
+    		Message response = peer.getMessageHandler().dispatchRequest(peers.get(i), request);
+
+    	}
+
+
+
 	}
 
-	// TODO send delete
-    	private void sendDELETErequest(){
-
-   	}
 }

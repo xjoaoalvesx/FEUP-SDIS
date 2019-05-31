@@ -85,7 +85,7 @@ public class MessageHandler extends Thread{
 
 	public Message manageRequest(Message message){
 
-		System.out.println("Received Request " + message.getMessageType() + " Message.");
+		System.out.println("Received Request " + message.getMessageType() + " Message from : " + message.getSender() + " .");
 
 		Message response = null;
 
@@ -108,7 +108,15 @@ public class MessageHandler extends Thread{
 
 			case DELETE:
 				response = manageDeleteRequest(message);
+				break;
 
+			case DELETE_FILE:
+				executor.submit(() -> manageDeleteFileRequest(message));
+				break;
+
+			case FILE:
+				response = manageFileRequest(message);
+				break;
 			default:
 				break;
 		}
@@ -116,6 +124,29 @@ public class MessageHandler extends Thread{
 		return response;
 	}
 
+
+	private Message manageFileRequest(Message request){
+
+		String filePath = (String) request.getMessageData();
+
+
+		return Message.fileResponse(Message.Type.FILE, node.getServerAddress(), node.getId(), node.getFile(filePath));
+
+	}
+
+	private void manageDeleteFileRequest(Message request){
+
+		String fileId = (String) request.getMessageData();
+		try{
+			node.getManager().removeDirFromSystem(fileId);
+		}catch(IOException e){
+			System.out.println("Error removing folder");
+		}
+		
+
+	}
+
+	
 
 	private void manageChunkRequest(Message request){
 
@@ -138,7 +169,7 @@ public class MessageHandler extends Thread{
 
 		if(saved){
 
-			Message saveChunkResponse = manageSaveChunk(chunk.getFileID(), chunk.getFilePath(), request.getSender());
+			Message saveChunkResponse = manageSaveChunk(chunk.getFileID(), chunk.getFilePath(), node.getLocalAddress());
 			Message response = this.dispatchRequest(node.getServerAddress(), saveChunkResponse);
 		}
 	}
@@ -151,8 +182,6 @@ public class MessageHandler extends Thread{
 
 	private Message manageDeleteRequest(Message request){
 
-		System.out.println((String) request.getMessageData());
-		System.out.println(node.getBackupFilesMap((String) request.getMessageData()));
 		return Message.deleteResponse(Message.Type.DELETE, node.getLocalAddress(), node.getBackupFilesMap((String) request.getMessageData()));
 	}
 
@@ -221,8 +250,6 @@ public class MessageHandler extends Thread{
 		String[] file = aux.split(" ");
 		String filePath = file[0];
 		String fileId = file[1];
-		System.out.println(filePath);
-		System.out.println(fileId);
 
 		node.addBackupFile(fileId, request.getSender());
 		node.addFile(fileId, filePath);

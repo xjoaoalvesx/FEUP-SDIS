@@ -5,6 +5,7 @@ import network.workers.MessageHandler;
 import network.workers.Listener;
 import filesystem.PeerSystemManager;
 import subprotocols.Backup;
+import subprotocols.Delete;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Scanner;
@@ -95,7 +96,7 @@ public class Peer implements Node, RemoteService{
 	@Override
 	public void delete(String path){
 
-		System.out.println("delete");
+		executor.submit(new Delete(this, path));
 	}
 
 	@Override
@@ -139,7 +140,23 @@ public class Peer implements Node, RemoteService{
 	}
 
 	@Override
-	public ArrayList<InetSocketAddress> getBackupFilesMap(String fileID){
+	public ArrayList<InetSocketAddress> getBackupFilesMap(String filePath){
 		return null;
 	}
+
+	@Override
+	public void addFile(String fileId, String filePath){
+		return;
+	}
+
+	@Override
+	public String getFile(String filePath){
+		return null;
+	}
+
+	@Override
+	public PeerSystemManager getManager(){
+		return this.manager;
+	}
+
 }

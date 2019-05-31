@@ -12,7 +12,7 @@ import javax.xml.crypto.Data;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 
-import static filesystem.PeerSystemManager.encode;
+import filesystem.PeerSystemManager;
 
 public class Server implements Node{
 
@@ -93,7 +93,6 @@ public class Server implements Node{
 	public ArrayList<InetSocketAddress> getBackupFilesMap(String filePath){
 
 		String fileID = getFile(filePath);
-		System.out.println(fileID);
 
 		ArrayList<InetSocketAddress> list = new ArrayList<>();
 
@@ -127,6 +126,9 @@ public class Server implements Node{
 		return this.server_address;
 	}
 
-
+	@Override
+	public PeerSystemManager getManager(){
+		return null;
+	}
 
 }

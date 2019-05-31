@@ -109,8 +109,6 @@ public class Listener extends Thread {
 
 		Message response = null;
 
-		System.out.print("isRequest: ");
-		System.out.println(message.isRequest());
 		if(message.isRequest()){
 			response = messageHandler.manageRequest(message);
 		}else{

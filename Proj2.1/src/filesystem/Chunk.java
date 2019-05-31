@@ -11,12 +11,14 @@ public class Chunk implements Serializable{
     private byte[] chunkData;
     private int replicationDegree;
     private int currentReplication;
+    private String filePath;
 
-    public Chunk(int chunkID, String fileID, byte[] chunkData, int replicationDegree){
+    public Chunk(int chunkID, String fileID, byte[] chunkData, int replicationDegree, String filePath){
         this.chunkID = chunkID;
         this.fileID = fileID;
         this.chunkData = chunkData;
         this.replicationDegree = replicationDegree;
+        this.filePath = filePath;
     }
 
     public int getID(){
@@ -37,6 +39,10 @@ public class Chunk implements Serializable{
     
     public int getSize(){
         return (int) chunkData.length;
+    }
+
+    public String getFilePath(){
+        return this.filePath;
     }
 }
 

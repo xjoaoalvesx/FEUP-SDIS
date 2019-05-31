@@ -51,7 +51,7 @@ public class TestApp implements Runnable{
 
 	public static void main(String[] args){
 
-		if(args.length != 4){
+		if(args.length != 4 && args.length != 3){
 
 			System.out.println("Usage:");
 			System.out.println("\tjava -classpath bin service.Client <peer_id> <subprotocol> <opnd_1> <opnd_2>");
@@ -60,8 +60,11 @@ public class TestApp implements Runnable{
 
 		String peerID = args[0];
 		String protocol = args[1];
-		String opnd1 = args[2];
-		String opnd2 = args[3];
+		// String opnd1 = args[2];
+		// String opnd2 = args[3];
+
+		String opnd1 = args.length > 2 ? args[2] : null;
+		String opnd2 = args.length > 3 ? args[3] : null;
 
 		TestApp testApp = new TestApp(peerID, protocol, opnd1, opnd2);
 		new Thread(testApp).start();

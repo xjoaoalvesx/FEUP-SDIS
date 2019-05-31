@@ -3,6 +3,8 @@ package network;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 
+import filesystem.PeerSystemManager;
+
 public interface Node {
 
 
@@ -20,5 +22,13 @@ public interface Node {
 
 	public void addBackupFile(String fileId, InetSocketAddress peer_add);
 
-	public ArrayList<InetSocketAddress> getBackupFilesMap(String fileID);
+	public ArrayList<InetSocketAddress> getBackupFilesMap(String filePath);
+
+	public void addFile(String fileId, String filePath);
+
+	public String getFile(String filePath);
+
+
+	public PeerSystemManager getManager();
+
 }

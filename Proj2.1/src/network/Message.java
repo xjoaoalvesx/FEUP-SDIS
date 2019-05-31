@@ -31,6 +31,8 @@ public class Message implements Serializable{
 		ACCEPTED,
 		CHUNK,
 		SAVECHUNK,
+		FILE,
+		DELETE_FILE,
 		RECEIVED
 	}
 
@@ -99,10 +101,36 @@ public class Message implements Serializable{
 		return message;
 	}
 
+	public static Message fileRequest(Type t, InetSocketAddress senderAddress, int id, String filePath){
+		Message message = new Message(t);
+		message.sender = senderAddress;
+		message.identifier = id;
+		message.isOfTypeRequest = true;
+		message.data = filePath;
+		return message;
+	}
+
+	public static Message fileResponse(Type t, InetSocketAddress senderAddress, int id, String fileId){
+		Message message = new Message(t);
+		message.sender = senderAddress;
+		message.identifier = id;
+		message.isOfTypeRequest = false;
+		message.data = fileId;
+		return message;
+	}
+
 	public static Message saveChunkResponse(Type t, InetSocketAddress senderAddress, String file){
 		Message message = new Message(t);
 		message.sender = senderAddress;
 		message.data = file;
+		message.isOfTypeRequest = true;
+		return message;
+	}
+
+	public static Message deleteFileRequest(Type t, InetSocketAddress senderAddress, String fileId){
+		Message message = new Message(t);
+		message.sender = senderAddress;
+		message.data = fileId;
 		message.isOfTypeRequest = true;
 		return message;
 	}

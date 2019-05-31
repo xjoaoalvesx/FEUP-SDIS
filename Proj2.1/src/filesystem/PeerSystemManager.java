@@ -115,7 +115,7 @@ public class PeerSystemManager{
         while(i < (size - 64000)){
             byte[] tempbuf = Arrays.copyOfRange(buffer, i, i+64000);
             
-            chunks[c] = new Chunk(c, fileId, tempbuf, repD);
+            chunks[c] = new Chunk(c, fileId, tempbuf, repD, path);
             
             i = i + 64000;
             c++;
@@ -125,7 +125,7 @@ public class PeerSystemManager{
 
         byte[] lastbuf = Arrays.copyOfRange(buffer, i, i+lastSize);     
 
-        chunks[c] = new Chunk(c, fileId, lastbuf, repD);
+        chunks[c] = new Chunk(c, fileId, lastbuf, repD, path);
        // System.out.println(chunks[0].getChunkData().length);
         return chunks;
 
@@ -144,7 +144,7 @@ public class PeerSystemManager{
 
     }
 
-    private static String encode(String string) throws NoSuchAlgorithmException{
+    public static String encode(String string) throws NoSuchAlgorithmException{
 
 
 
@@ -312,26 +312,26 @@ public class PeerSystemManager{
     //     return backup_chunks.remove(fileId); // removes key and corresponding values from map , returns V
     // }
 
-    // public void removeDirFromSystem(String fileId) throws IOException{
+    public void removeDirFromSystem(String fileId) throws IOException{
        
-    //     String path_of_file = this.path + "backup/" + fileId;
+        String path_of_file = this.path + "backup/" + fileId;
 
-    //     Path directory = Paths.get(path_of_file);
-    //     Files.walkFileTree(directory, new SimpleFileVisitor<Path>() {
-    //         @Override
-    //         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-    //             Files.delete(file);
-    //             return FileVisitResult.CONTINUE;
-    //         }
+        Path directory = Paths.get(path_of_file);
+        Files.walkFileTree(directory, new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                Files.delete(file);
+                return FileVisitResult.CONTINUE;
+            }
 
-    //         @Override
-    //         public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-    //             Files.delete(dir);
-    //             return FileVisitResult.CONTINUE;
-    //         }   
-    //     });
+            @Override
+            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                Files.delete(dir);
+                return FileVisitResult.CONTINUE;
+            }   
+        });
 
-    // }
+    }
  
     //returns free space
     
