@@ -21,8 +21,8 @@ public class Server implements Node{
 	private Listener listener;
 	//private ServerSocket serverSocket;
 
-	private ConcurrentHashMap<Integer, ConcurrentHashMap<Integer, String>> peers; 	// ID -> port, ip
-	// private ConcurrentMap<String, String> files; 								// fileID -> chunkID
+	private ConcurrentHashMap<Integer, InetSocketAddress> peers; 	// ID -> port, ip
+	//private ConcurrentMap<String, String> backedUpFiles; 								// fileID -> chunkID
 	// private ConcurrentHashMap<String, Integer> chunks; 							// chunkID -> ID
 
 	public Server(InetSocketAddress address){
@@ -52,6 +52,25 @@ public class Server implements Node{
 
 
 	@Override
+	public void addPeer(InetSocketAddress peer_add , int idPeer){
+		peers.putIfAbsent(idPeer, peer_add);
+		System.out.println(peers);
+	}
+
+	@Override
+	public ArrayList<InetSocketAddress> getPeers(){
+
+		ArrayList<InetSocketAddress> list = new ArrayList<>();
+
+		for (Map.Entry<Integer, InetSocketAddress> entry : peers.entrySet()) {
+    		list.add(entry.getValue());
+		}
+
+		return list;
+	}
+
+
+	@Override
 	public void startWorkers(){
 		listener.start();
 	}
@@ -61,49 +80,55 @@ public class Server implements Node{
 		return this.server_address;
 	}
 
-	
-}
-
-class PeerHandler extends Thread{
-	
-	private SSLSocket ssl;
-	private DataInputStream input;
-	private DataOutputStream output;
-
-	public PeerHandler(SSLSocket s, DataInputStream input, DataOutputStream output){
-		this.ssl = s;
-		this.input = input;
-		this.output = output;
+	@Override
+	public int getId(){
+		return 1;
 	}
 
-    @Override
-    public void run()  
-    { 
-		String received;
-		String toreturn;
 
-        while (true)  
-        { 
-            try { 
-				output.writeUTF("Write Exit to terminate connection");
-				received = input.readUTF();
-
-				if(received.equals("Exit")){
-					System.out.println("Client " + this.ssl + "sends exit...");
-					this.ssl.close();
-					System.out.println("Connection closed");
-					break;
-				}
-				
-            } catch (IOException e) { 
-                e.printStackTrace(); 
-            } 
-		}
-		try{
-			this.input.close();
-			this.output.close();
-		}catch(IOException e){
-			e.printStackTrace();
-		}
-    }
+	
 }
+
+// class PeerHandler extends Thread{
+	
+// 	private SSLSocket ssl;
+// 	private DataInputStream input;
+// 	private DataOutputStream output;
+
+// 	public PeerHandler(SSLSocket s, DataInputStream input, DataOutputStream output){
+// 		this.ssl = s;
+// 		this.input = input;
+// 		this.output = output;
+// 	}
+
+//     @Override
+//     public void run()  
+//     { 
+// 		String received;
+// 		String toreturn;
+
+//         while (true)  
+//         { 
+//             try { 
+// 				output.writeUTF("Write Exit to terminate connection");
+// 				received = input.readUTF();
+
+// 				if(received.equals("Exit")){
+// 					System.out.println("Client " + this.ssl + "sends exit...");
+// 					this.ssl.close();
+// 					System.out.println("Connection closed");
+// 					break;
+// 				}
+				
+//             } catch (IOException e) { 
+//                 e.printStackTrace(); 
+//             } 
+// 		}
+// 		try{
+// 			this.input.close();
+// 			this.output.close();
+// 		}catch(IOException e){
+// 			e.printStackTrace();
+// 		}
+//     }
+// }

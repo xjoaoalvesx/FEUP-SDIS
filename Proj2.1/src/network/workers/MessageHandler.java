@@ -4,6 +4,10 @@ import network.Message;
 import network.Peer;
 import network.Server;
 import network.Node;
+import filesystem.Chunk;
+
+import static filesystem.PeerSystemManager.createDirectories;
+import static filesystem.PeerSystemManager.saveFile;
 
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
@@ -24,16 +28,11 @@ public class MessageHandler extends Thread{
 	private ExecutorService executor;
 
 
-	public MessageHandler(Node peer){
-		this.node = peer;
-		this.executor = Executors.newFixedThreadPool(3);
+	public MessageHandler(Node node){
+		this.node = node;
+		this.executor = Executors.newFixedThreadPool(10);
 
 	}
-
-
-
-
-
 
 
 	public Message dispatchRequest(InetSocketAddress address, Message message){
@@ -88,17 +87,57 @@ public class MessageHandler extends Thread{
 			case REGISTER:
 				response = manageRegisterRequest(message);
 				break;
+		
+			case BACKUP:
+				response = manageBackupRequest(message);
+				break;
 
+			case CHUNK:
+				executor.submit(() -> manageChunkRequest(message));
+				break;
+
+			default:
+				break;
 		}
 
 		return response;
 	}
 
 
-	private Message manageRegisterRequest(Message request){
-		System.out.println("New Peer Assigned!\n");
+	private void manageChunkRequest(Message request){
 
-		return Message.response(Message.Type.ACCEPTED, request.getIdentifier());
+		Boolean saved;
+		Chunk chunk = (Chunk) request.getMessageData();
+
+		byte[] data = chunk.getChunkData();
+
+		String chunk_path = "peers/Peer" + node.getId() + "/backup/" + chunk.getFileID();
+
+
+		createDirectories(chunk_path);
+
+		try {
+    		saved = saveFile(Integer.toString(chunk.getID()), chunk_path, data);
+        } catch (IOException e) {
+            System.out.println("Fail saving the chunk!");
+           	saved = false;
+        }
+		
+
+	}
+
+	private Message manageBackupRequest(Message request){
+
+		return Message.backupResponse(Message.Type.BACKUP, node.getLocalAddress(), node.getPeers());
+	}
+	private Message manageRegisterRequest(Message request){
+
+
+		System.out.println("New Peer Assigned : ID " + request.getMessageData() +"\n");
+
+		node.addPeer(request.getSender(), (int)request.getMessageData());
+
+		return Message.response(Message.Type.ACCEPTED, node.getLocalAddress(), request.getIdentifier());
 	}
 
 	// socket send and socket receive functions

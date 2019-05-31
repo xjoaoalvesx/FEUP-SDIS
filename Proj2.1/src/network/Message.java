@@ -1,10 +1,16 @@
 package network;
 
+
+import filesystem.Chunk;
+
+
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+
+import java.util.ArrayList;
 
 
 import java.io.Serializable;
@@ -23,7 +29,8 @@ public class Message implements Serializable{
 		RESTORE,
 		REGISTER,
 		ACCEPTED,
-		CHUNK
+		CHUNK,
+		SAVECHUNK
 	}
 
 
@@ -41,18 +48,36 @@ public class Message implements Serializable{
 		this.type = t;
 	}
 
-	public static Message request(Type t, InetSocketAddress senderAddress){
+	public static Message request(Type t, InetSocketAddress senderAddress, int nodeId){
 		Message message = new Message(t);
 		message.sender = senderAddress;
 		message.isOfTypeRequest = true;
+		message.data = nodeId;
 
 		return message;
 	}
 
-	public static Message response(Type t, int id){
+	public static Message response(Type t, InetSocketAddress senderAddress, int id){
 		Message message = new Message(t);
+		message.sender = senderAddress;
 		message.identifier = id;
 		message.isOfTypeRequest = false;
+		return message;
+	}
+
+	public static Message backupResponse(Type t, InetSocketAddress senderAddress, ArrayList<InetSocketAddress> peersToBackup){
+		Message message = new Message(t);
+		message.sender = senderAddress;
+		message.data = peersToBackup;
+		message.isOfTypeRequest = false;
+		return message;
+	}
+
+	public static Message chunkRequest(Type t, InetSocketAddress senderAddress, Chunk chunk){
+		Message message = new Message(t);
+		message.sender = senderAddress;
+		message.data = chunk;
+		message.isOfTypeRequest = true;
 		return message;
 	}
 

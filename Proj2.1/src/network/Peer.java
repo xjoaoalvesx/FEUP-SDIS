@@ -3,9 +3,15 @@ package network;
 import service.RemoteService;
 import network.workers.MessageHandler;
 import network.workers.Listener;
+import filesystem.PeerSystemManager;
+import subprotocols.Backup;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Scanner;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.ArrayList;
+
 
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
@@ -30,6 +36,9 @@ public class Peer implements Node, RemoteService{
 	private MessageHandler messageHandler;
 	private Listener listener;
 
+	private PeerSystemManager manager;
+	private ExecutorService executor;
+
 	public Peer(int peerID, InetSocketAddress address, InetSocketAddress server_ad){
 
 		this.peerID = peerID;
@@ -43,7 +52,8 @@ public class Peer implements Node, RemoteService{
 
 		this.messageHandler = new MessageHandler(this);
 		this.listener = new Listener(this, messageHandler);
-
+		this.manager = new PeerSystemManager(this);
+		this.executor = Executors.newFixedThreadPool(5);
 		startWorkers();
 
 		registerToServer(serverAddress);
@@ -61,7 +71,7 @@ public class Peer implements Node, RemoteService{
 			System.out.println("Failed to register to server");
 		}
 
-		Message request = Message.request(Message.Type.REGISTER, peerAddress);
+		Message request = Message.request(Message.Type.REGISTER, peerAddress, this.peerID);
 
 		Message response = messageHandler.dispatchRequest(server, request);
 
@@ -79,7 +89,7 @@ public class Peer implements Node, RemoteService{
 	@Override
 	public void backup(String path, int replicationDegree){
 
-		System.out.println("backup");
+		executor.submit(new Backup(this, path, replicationDegree));
 	}
 
 	@Override
@@ -97,6 +107,29 @@ public class Peer implements Node, RemoteService{
 	@Override
 	public InetSocketAddress getLocalAddress(){
 		return this.peerAddress;
+	}
+
+	public InetSocketAddress getServerAddress(){
+		return this.serverAddress;
+	}
+
+	@Override
+	public ArrayList<InetSocketAddress> getPeers(){
+		return null;
+	}
+
+	@Override
+	public void addPeer(InetSocketAddress peer_add , int idPeer){
+		return ;
+	}
+
+	@Override
+	public int getId(){
+		return this.peerID;
+	}
+
+	public MessageHandler getMessageHandler(){
+		return this.messageHandler;
 	}
 
 }

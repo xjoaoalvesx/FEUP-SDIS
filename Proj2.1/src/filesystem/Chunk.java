@@ -1,30 +1,42 @@
 package filesystem;
 
-public class Chunk{
+import java.io.Serializable;
 
-  private int chunkID;
-  private String fileID;
-  private byte[] chunkData;
+public class Chunk implements Serializable{
 
-  public Chunk(int chunkID; String fileID; byte[] chunkData){
+    static final long serialVersionUID = 423L;
 
-    this.chunkID = chunkID;
-    this.fileID = fileID;
-    this.chunkData = chunkData;
-  }
+    private int chunkID;
+    private String fileID;
+    private byte[] chunkData;
+    private int replicationDegree;
+    private int currentReplication;
 
-  public int getChunkID(){
+    public Chunk(int chunkID, String fileID, byte[] chunkData, int replicationDegree){
+        this.chunkID = chunkID;
+        this.fileID = fileID;
+        this.chunkData = chunkData;
+        this.replicationDegree = replicationDegree;
+    }
 
-    return this.chunkID;
-  }
+    public int getID(){
+        return this.chunkID;
+    }
 
-  public String getFileID(){
+    public String getFileID(){
+        return this.fileID;
+    }
 
-    return this.fileID;
-  }
+    public byte[] getChunkData(){
+        return this.chunkData;
+    }
 
-  public byte[] getChunkData(){
-
-    return this.chunkData;
-  }
+    public int getReplicationDegree(){
+        return this.replicationDegree;
+    }
+    
+    public int getSize(){
+        return (int) chunkData.length;
+    }
 }
+
