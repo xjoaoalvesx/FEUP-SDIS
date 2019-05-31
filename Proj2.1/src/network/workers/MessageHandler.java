@@ -106,8 +106,6 @@ public class MessageHandler extends Thread{
 
 	private void manageChunkRequest(Message request){
 
-		System.out.println("request");
-		System.out.println(request);
 		Boolean saved;
 		Chunk chunk = (Chunk) request.getMessageData();
 
